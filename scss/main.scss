@@ -1,0 +1,61 @@
+// sass --watch scss:css
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+// Debug
+// * {
+//     border: 1px dotted red;
+// }
+// Tema
+$primary: #792396;
+$primary-text: white;
+$secondary: $gray-600;
+$secondary-text: white;
+$success: $green;
+$info: $cyan;
+$warning: $yellow;
+$danger: $red;
+$light: $gray-100;
+$dark: $gray-800;
+$theme-colors: ("primary": $primary, "primary-text": $primary-text, "secondary": $secondary, "secondary-text": $secondary-text, "success": $success, "info": $info, "warning": $warning, "danger": $danger, "light": $light, "dark": $dark);
+$body-bg: $light;
+$body-color: $gray-900;
+// Elementos HTML
+h1 {
+    text-align: center;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+    // width: 100%;
+    // height: auto;
+    object-fit: contain;
+}
+
+.container-fluid {
+    background-color: $primary;
+}
+
+.importante {
+    font-size: $font-size-lg * 2;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+img.perfil-mini {
+    width: 25px;
+    height: 25px;
+}
+
+img.perfil-medio {
+    width: 50px;
+    height: 50px;
+}
+
+img.perfil-grande {
+    width: 100px;
+    height: 100px;
+}
+
+//
+@import "bootstrap/bootstrap";
