@@ -9,9 +9,9 @@ if (isset($_SESSION['iniciada'])){
     $correo = $_POST['correo_edixit'];
     $contra = $_POST['contra_edixit'];
     require('registro.php');
-    if (!$error){
-        header('Location: ../usuario/editar');
-    }
+    // if (!$error){
+    //     header('Location: ../usuario/editar');
+    // }
 }
 require("../cabecera.php");
 // $error = 'La página no hace nada: no se ha implementado todavía';
