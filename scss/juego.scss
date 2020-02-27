@@ -1,0 +1,13 @@
+// sass --watch scss:css
+body {
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+    border: 0px;
+    margin: 0px;
+}
+
+canvas {
+    border: 0px;
+    // width: 100%;
+}
