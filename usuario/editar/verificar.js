@@ -1,3 +1,7 @@
+if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+}
+
 var cImagen, cNombre, cEmail, cContra1, cContra2;
 
 function init() {

@@ -10,7 +10,10 @@ if (!$_SESSION['verificada']){
 if (!isset($imagen) && !isset($nombre) && !isset($correo) && !isset($contra)){
     die('Error interno c0002');
 }
+
+$cambios = false;
 if (!empty($nombre) || !empty($correo) || !empty($contra)) {
+    $cambios = true;
     $enlace = mysqli_connect('localhost', 'usuario_dixit', 'jy8-YBk*WV..DVM', 'db_dixit');
 
     if (!$enlace) {
@@ -44,7 +47,10 @@ if (!empty($nombre) || !empty($correo) || !empty($contra)) {
     }
 
     mysqli_close($enlace);
-} else if (!empty($imagen['tmp_name'])){
+}
+
+if (!empty($imagen['tmp_name'])){
+    $cambios = true;
     if ($imagen['error'] === UPLOAD_ERR_OK){
         $tipo = mime_content_type($imagen['tmp_name']);
         if (strpos($tipo, 'image/')!==false){
@@ -86,7 +92,10 @@ if (!empty($nombre) || !empty($correo) || !empty($contra)) {
             $error = 'Error: No se pudo subir el archivo ('.$imagen['error'].')';
         }
     }
-} else {
-    $error = 'No hubo cambios';
+} 
+if (!$cambios) {
+    var_dump($imagen);
+    die();
+    $error = 'No hubo cambios ';
 }
 ?>
