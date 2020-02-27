@@ -4,10 +4,11 @@ session_start();
     use PHPMailer\PHPMailer\SMTP;
     use PHPMailer\PHPMailer\Exception;
 
-    $enlaceConfirmar = 'http://cristichi.ga/eDixit/usuario/verificar/?verificacion='.urlencode($_SESSION['verificacion']).'&correo='.urlencode($_SESSION['usuario_correo']);
-    $body = 'Hola, '.$_SESSION['usuario_nombre'].' <a href="'.$enlaceConfirmar.'">verifica aquí</a> tu correo electrónico para acceder a todas las características de eDixit<br>
+    $enlaceConfirmar = $_SERVER['SERVER_NAME'].'/eDixit/usuario/verificar/?verificacion='.urlencode($_SESSION['verificacion']).'&correo='.urlencode($_SESSION['usuario_correo']);
+    
+    $body = 'Hola, '.$_SESSION['usuario_nombre'].' <a href="http://'.$enlaceConfirmar.'">verifica aquí</a> tu correo electrónico para acceder a todas las características de eDixit<br>
     También puedes copiar el siguiente enlace y pegarlo en la ventana de tu navegador:<br>'.$enlaceConfirmar;
-    $bodySinHTML = 'Hola, '.$_SESSION['usuario_nombre'].' copia y pega esto en un navegador para verificar su correo: '.$enlaceConfirmar.' para acceder a todas las características de eDixit';
+    $bodySinHTML = 'Hola, '.$_SESSION['usuario_nombre'].' copia y pega esto en un navegador para verificar su correo: http://'.$enlaceConfirmar.' para acceder a todas las características de eDixit';
     
 
     try {
@@ -16,7 +17,7 @@ session_start();
         require '../../phpmailer/src/SMTP.php';
         
         $mail = new PHPMailer();
-         
+        
         //Server settings
         // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
         $mail->isSMTP();

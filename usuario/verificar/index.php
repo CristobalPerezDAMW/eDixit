@@ -6,7 +6,8 @@
     $enlace = mysqli_connect('localhost', 'usuario_dixit', 'jy8-YBk*WV..DVM', 'db_dixit');
     
     $cod = $enlace->real_escape_string($_GET['verificacion']);
-    $correoE = $enlace->real_escape_string(urldecode($_GET['correo']));
+    $correo = urldecode($_GET['correo']);
+    $correoE = $enlace->real_escape_string($correo);
 
     if ($enlace) {
         $sql = 'SELECT Nombre, Verificacion FROM usuarios WHERE Correo=\''.$correoE.'\' AND Verificacion=\''.$cod.'\'';
@@ -19,16 +20,25 @@
                 $consulta = mysqli_query($enlace, $sql);
                 if ($consulta) {
                     if (isset($_SESSION['iniciada'])){
-                        session_destroy();
-                        $_SESSION = array();
-                        $iniciada = true;
-                    } else
-                        $iniciada = false;
+                        if ($correo == $_SESSION['usuario_correo']){
+                            $cerrada = false;
+                            $_SESSION['verificada'] = true;
+                            // echo '<h1>Su correo ha sido verificado con éxito</h1>';
+                        } else {
+                            session_destroy();
+                            $_SESSION = array();
+                            // echo '<h1>Su correo ha sido verificado con éxito, se deberá iniciar sesión de nuevo</h1>';
+                            $cerrada = true;
+                        }
+                    } else{
+                        $cerrada = false;
+                        // echo '<h1>Su correo ha sido verificado con éxito</h1>';
+                    }
                     
                     $ruta = '../..';
                     $pag = 'Correo Verificado';
                     require('../../cabecera.php');
-                    if ($iniciada){
+                    if ($cerrada){
                         echo '<h1>Su correo ha sido verificado con éxito, se deberá iniciar sesión de nuevo</h1>';
                     } else {
                         echo '<h1>Su correo ha sido verificado con éxito</h1>';

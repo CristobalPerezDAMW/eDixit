@@ -40,7 +40,7 @@ if (isset($_SESSION['iniciada'])){
     <?php echo '<title>Dixit Electrónico - '.$pag.'</title>'; ?>
 </head>
 
-<!-- Muchas veces es necesario en javascript -->
+<!-- Muchas veces es necesario en javascript que se hagan cosas tras la carga de la página, de modo que si existe intentará llamar a la función init() -->
 
 <body onload="init()">
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -57,12 +57,12 @@ if (isset($_SESSION['iniciada'])){
     <div class="container">
         <nav class="navbar navbar-expand-md navbar-light bg-light">
             <header>
-                <?php
-            echo '
-            <a class="navbar-brand" href="'.$ruta.'">
-                <img src="'.$ruta.'/imgs/edixit-banner.png" alt="Logo eDixit">
-            </a>
-            ';
+            <?php
+                echo '
+                <a class="navbar-brand" href="'.$ruta.'">
+                    <img src="'.$ruta.'/imgs/edixit-banner.png" alt="Logo eDixit">
+                </a>
+                ';
             ?>
             </header>
             <button class="navbar-toggler ml-auto d-md-none" type="button" data-toggle="collapse"
@@ -97,14 +97,14 @@ if (isset($_SESSION['iniciada'])){
                         </div>
                     </li>
                     <li class="nav-item dropdown active">
-                        <?php
-                    echo '
-                    <a class="nav-link dropdown-toggle" href="'.$ruta.'/#" id="dropdown2" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">Contacto</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item '.($actual=='/eDixit/yo/index.php'?'disabled':'').'" href="'.$ruta.'/yo/">Nosotros</a>
-                    </div>
-                    ';
+                    <?php
+                        echo '
+                        <a class="nav-link dropdown-toggle" href="'.$ruta.'/#" id="dropdown2" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">Contacto</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item '.($actual=='/eDixit/yo/index.php'?'disabled':'').'" href="'.$ruta.'/yo/">Nosotros</a>
+                        </div>
+                        ';
                     ?>
                     </li>
                     <?php 
@@ -148,6 +148,6 @@ if (isset($_SESSION['iniciada'])){
             '.$_SESSION['mensaje_cabecera'].'
         </div>
         ';
-        // unset($_SESSION['mensaje_cabecera']);
+        unset($_SESSION['mensaje_cabecera']);
     }
     ?>

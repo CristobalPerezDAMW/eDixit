@@ -17,6 +17,8 @@ if (!isset($_SESSION['iniciada'])){
 require("../../cabecera.php");
 
 ?>
+<script src="verificar.js">
+</script>
 <div class="container">
     <div class="row">
         <div class="col-12 d-flex justify-content-center">
@@ -90,40 +92,12 @@ require("../../cabecera.php");
                 echo '<p class="alert-danger">'.$error.'</p>';
             }
             ?>
-        <button type="submit" class="btn btn-primary btn-outline-primary-text" name="actualizar_info">Actualizar
-            información</button>
+        <?php 
+        echo'<button type="submit"
+                class="btn '.($_SESSION['verificada']?'btn-primary btn-outline-primary-text"':'btn-disabled btn-outline-disabled-text" disabled').' name="actualizar_info">Actualizar información</button>';?>
         </form>
     </fieldset>
 </div>
-
-<script>
-var cImagen, cNombre, cEmail, cContra1, cContra2;
-
-function init() {
-    cImagen = document.getElementById("cImagen");
-    cNombre = document.getElementById("cNombre");
-    cEmail = document.getElementById("cEmail");
-    cContra1 = document.getElementById("cContra1");
-    cContra2 = document.getElementById("cContra2");
-    // console.log(cImagen);
-    // console.log(cNombre);
-    // console.log(cEmail);
-    // console.log(cContra1);
-    // console.log(cContra2);
-}
-
-function check() {
-    if (cImagen.value == "" && cNombre.value == "" && cEmail.value == "" && cContra1.value == "") {
-        alert("Esta acción no hubiera supuesto ningún cambio");
-        return false;
-    }
-    if (cContra1.value != cContra2.value) {
-        alert("Las contraseñas no coinciden");
-        return false;
-    }
-    return true;
-}
-</script>
 </body>
 
 </html>
