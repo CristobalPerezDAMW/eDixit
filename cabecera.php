@@ -42,7 +42,7 @@ if (isset($_SESSION['iniciada'])){
 
 <!-- Muchas veces es necesario en javascript que se hagan cosas tras la carga de la página, de modo que si existe intentará llamar a la función init() -->
 
-<body onload="init()">
+<body onload=" if (typeof init === 'function') {init();}">
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
     </script>
@@ -57,7 +57,7 @@ if (isset($_SESSION['iniciada'])){
     <div class="container">
         <nav class="navbar navbar-expand-md navbar-light bg-light">
             <header>
-            <?php
+                <?php
                 echo '
                 <a class="navbar-brand" href="'.$ruta.'">
                     <img src="'.$ruta.'/imgs/edixit-banner.png" alt="Logo eDixit">
@@ -97,12 +97,12 @@ if (isset($_SESSION['iniciada'])){
                         </div>
                     </li>
                     <li class="nav-item dropdown active">
-                    <?php
+                        <?php
                         echo '
                         <a class="nav-link dropdown-toggle" href="'.$ruta.'/#" id="dropdown2" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">Contacto</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item '.($actual=='/eDixit/yo/index.php'?'disabled':'').'" href="'.$ruta.'/yo/">Nosotros</a>
+                            <a class="dropdown-item '.($actual=='/eDixit/nosotros/index.php'?'disabled':'').'" href="'.$ruta.'/nosotros/">Nosotros</a>
                         </div>
                         ';
                     ?>
@@ -138,7 +138,7 @@ if (isset($_SESSION['iniciada'])){
 
     <?php
     echo '    
-    <div class="container-fluid text-primary-text pt-3 pb-2 mt-1 mb-5">
+    <div class="container-fluid bg-primary text-primary-text pt-3 pb-2 mt-1 mb-5">
         <p class="importante">'.$pag.'</p>
     </div>
     ';

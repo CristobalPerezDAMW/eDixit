@@ -21,8 +21,9 @@
                 if ($consulta) {
                     if (isset($_SESSION['iniciada'])){
                         if ($correo == $_SESSION['usuario_correo']){
-                            $cerrada = false;
                             $_SESSION['verificada'] = true;
+                            unset($_SESSION['verificacion']);
+                            $cerrada = false;
                             // echo '<h1>Su correo ha sido verificado con éxito</h1>';
                         } else {
                             session_destroy();
