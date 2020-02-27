@@ -34,6 +34,14 @@ img.perfil-grande {
   height: 100px;
 }
 
+.pregunta p {
+  font-size: 1.5rem;
+}
+
+.respueta p {
+  font-size: 1.25rem;
+}
+
 /*!
  * Bootstrap v4.3.1 (https://getbootstrap.com/)
  * Copyright 2011-2019 The Bootstrap Authors

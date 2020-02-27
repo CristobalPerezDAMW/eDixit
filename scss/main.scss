@@ -59,5 +59,13 @@ img.perfil-grande {
     height: 100px;
 }
 
+.pregunta p {
+    font-size: $font-size-lg*1.2;
+}
+
+.respueta p {
+    font-size: $font-size-lg;
+}
+
 //
 @import "bootstrap/bootstrap";

@@ -31,9 +31,9 @@ require("../cabecera.php");
             echo '<p class="error">'.($_SESSION['verificada']?'':'¡Tienes que verificar tu cuenta!').'</p>';
             ?>
         </div>
-        <div class="col-12 d-flex justify-content-center">
+        <div class="col-12 d-flex flex-column align-items-center justify-content-center">
             <?php 
-            echo '<p>'.($_SESSION['verificada']?'':'<a href="verificar/enviar_correo.php?volver=../editar">Volver a enviar email</a>').'</p>';
+            echo '<p>'.($_SESSION['verificada']?'':'<a href="verificar/enviar_correo.php?volver=../editar">Volver a enviar email</a></p><p>¿Tienes <a href="verificar/informacion">problemas para recibir el correo de verificación</a>?').'</p>';
             ?>
         </div>
     </div>
