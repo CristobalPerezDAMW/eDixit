@@ -13,7 +13,8 @@ require("../cabecera.php");
     <div class="row">
         <div class="col-12 d-flex justify-content-center">
             <?php
-            echo '<img class="perfil-grande" src="'.$foto.'" alt="Tu foto de perfil"/>';
+            // poniendo el ?=(tiempo) en la imagen me aseguro de que si ha cambiado desde la última vez que el navegador la descargó se invalida la caché
+            echo '<img class="perfil-grande" src="'.$foto.'?='.filemtime($foto).'" alt="Tu foto de perfil"/>';
             ?>
         </div>
         <div class="col-12 d-flex justify-content-center">

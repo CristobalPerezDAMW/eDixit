@@ -36,23 +36,23 @@ require("../../cabecera.php");
             echo '<p>'.$_SESSION['usuario_correo'].'</p>';
             ?>
         </div>
+        <?php
+            echo '
         <div class="col-12 d-flex justify-content-center">
-            <?php 
-            echo '<p class="error">'.($_SESSION['verificada']?'':'Tienes que verificar tu cuenta para editar tu perfil').'</p>';
-            ?>
+            <p class="error">'.($_SESSION['verificada']?'':'Tienes que verificar tu cuenta para editar tu perfil').'</p>
         </div>
         <div class="col-12 d-flex flex-column align-items-center justify-content-center">
-            <?php 
-            echo '<p>'.($_SESSION['verificada']?'':'<a href="../verificar/enviar_correo.php?volver=../editar">Volver a enviar email</a></p><p>¿Tienes <a href="../verificar/informacion">problemas para recibir el correo de verificación</a>?').'</p>';
-            ?>
+            <p>'.($_SESSION['verificada']?'':'<a href="../verificar/enviar_correo.php?volver=../editar">Volver a enviar email</a></p><p>¿Tienes <a href="../verificar/informacion">problemas para recibir el correo de verificación</a>?').'</p>
         </div>
+            ';
+        ?>
     </div>
 </div>
 
 <div class="container">
     <fieldset>
         <legend class="ml-2">Cambiar tus datos</legend>
-        <?php 
+        <?php
             if ($_SESSION['verificada'])
                 echo '<form method="POST" enctype="multipart/form-data" onsubmit="return check()">';
         ?>
@@ -93,8 +93,7 @@ require("../../cabecera.php");
             }
             ?>
         <?php 
-        echo'<button type="submit"
-                class="btn '.($_SESSION['verificada']?'btn-primary btn-outline-primary-text"':'btn-disabled btn-outline-disabled-text" disabled').' name="actualizar_info">Actualizar información</button>';?>
+        echo'<button type="submit" class="btn '.($_SESSION['verificada']?'btn-primary btn-outline-primary-text"':'btn-disabled btn-outline-disabled-text" disabled').' name="actualizar_info">Actualizar información</button>';?>
         </form>
     </fieldset>
 </div>
