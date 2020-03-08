@@ -143,7 +143,7 @@ if (isset($_SESSION['iniciada'])){
     </div>
     ';
     if (isset($_SESSION['mensaje_cabecera'])){
-        echo '    
+        echo '
         <div class="container-fluid '.($_SESSION['mensaje_cabecera_bien']?'bg-success':'bg-danger').' mb-4 text-primary-text d-flex justify-content-center align-items-center">
             '.$_SESSION['mensaje_cabecera'].'
         </div>

@@ -1,26 +1,47 @@
 body {
   display: flex;
+  flex-direction: column;
   justify-content: stretch;
-  align-items: flex-end;
+  align-items: stretch;
   border: 0px;
   margin: 0px;
 }
 
-#tusCartas {
-  max-width: 100%;
+#jugadores {
   display: flex;
-  flex-direction: column;
-  border: 1px solid red;
+  justify-content: space-evenly;
 }
 
+#jugadores img {
+  width: 10vh;
+  height: 10vh;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 1px solid black;
+}
+
+#jugadores img.tuPerfil {
+  border: 2px solid black;
+}
+
+#jugadores img.cuentacuentos {
+  background-clip: content-box;
+  background-color: yellow;
+}
+
+#tusCartas {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
 #tusCartas > div {
   max-width: 100%;
   display: flex;
   justify-content: space-evenly;
   flex-wrap: wrap;
-  border: 1px solid green;
 }
-
 #tusCartas > div > img {
   max-width: 10%;
   border: 1px solid blue;
@@ -30,9 +51,20 @@ body {
   -moz-box-sizing: border-box;
   margin: 1%;
 }
+#tusCartas > h1 {
+  text-align: center;
+}
 
 canvas {
   border: 0px;
+}
+
+.error {
+  width: 100%;
+  padding: 10px;
+  background: red;
+  color: white;
+  text-align: center;
 }
 
 /*# sourceMappingURL=juego.css.map */

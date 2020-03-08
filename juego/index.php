@@ -2,6 +2,8 @@
     // require('cabecera.php');
 ?>
 <?php
+// var_dump($_SERVER);
+// die();
 session_start();
 if (!isset($_SESSION['iniciada'])){
     header("Location: ../login");
@@ -13,6 +15,51 @@ $foto = $ruta.'/perfiles/'.parsearNombreArchivo($_SESSION['usuario_correo']).'.f
 if (!is_file($foto)){
     $foto = $ruta.'/imgs/sin_foto.png';
 }
+
+function rutaFoto($correo){
+    $foto = '../perfiles/'.parsearNombreArchivo($correo).'.foto';
+    if (is_file($foto)){
+        return $foto;
+    }
+    return '../imgs/sin_foto.png';
+}
+
+// Acceso a la base de datos xD
+
+$bbdd = @mysqli_connect('localhost', 'usuario_dixit', 'jy8-YBk*WV..DVM', 'db_dixit');
+$error = false;
+$jugadores = false;
+if (!$bbdd){
+    $error = 'La base de datos no está disponible<br>Sentimos las molestias';
+} else {
+
+    // Datos privados del Jugador en cuestión
+    $sql = 'SELECT Mano, Cuentacuentos FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
+    // die($sql);
+    $resultado = $bbdd->query($sql);
+
+    while (($fila = mysqli_fetch_array($resultado))){
+        $tu_mano = explode(':', $fila[0]);
+        $cuentacuentos = $fila[1];
+    }
+    $resultado->free();
+
+    // Datos Jugadores de la Partida
+    $sql = 'SELECT Nombre, Jugador, Posicion, Mano FROM usuarios, partida_jugador WHERE Partida IN (SELECT Id FROM Partidas WHERE Id IN (SELECT Partida FROM partida_jugador WHERE Jugador = \''.$_SESSION['usuario_correo'].'\')) AND Jugador = Correo';
+    // die($sql);
+    $resultado = $bbdd->query($sql);
+
+    while (($fila = mysqli_fetch_array($resultado))){
+        if ($fila[1]==$_SESSION['usuario_correo']){
+            $tu_mano = explode(':', $fila[3]);
+        }
+        $jugadores[$fila[1]] = array('Nombre'=>$fila[0], 'Posicion'=>$fila[2], 'Foto'=>rutaFoto($fila[1]));
+    }
+    $resultado->free();
+
+    $bbdd->close();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -28,41 +75,73 @@ if (!is_file($foto)){
         <link rel="shortcut icon" href="'.$ruta.'/imgs/edixit-logo.png">
     ';
     ?>
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 
     <?php echo '<title>Dixit Electrónico - '.$_SESSION['usuario_nombre'].'</title>'; ?>
 </head>
 
 <body onload="init()">
+<?php
+    if ($error){
+        die('<p class="error">'.$error.'</p>');
+    } else if (!$jugadores){
+        die('<p class="error">No estás en ninguna partida zopenco</p>');
+    }
+?>
 <script>
-var body, divTusCartas, jugadores;
+var body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano;
 
 function init() {
     body = document.body;
     divTusCartas = document.getElementById("tusCartas");
+    divJugadores = document.getElementById("jugadores");
     jugadores = new Array(
-        { correo: "<?php echo $_SESSION['usuario_correo']?>", cartas: new Array(1, 3, 4, 23, 10, 27) },
-        { correo: "otroseñor", cartas: new Array(6, 7, 9, 10, 13) },
-        { correo: "lul", cartas: new Array(2, 8, 5, 17, 12, 22) });
-    console.log(jugadores);
+    <?php
+    foreach ($jugadores as $correo => $jugador) {
+        echo '{
+            nombre: "'.$jugador['Nombre'].'",
+            correo: "'.$correo.'",
+            img: "'.$jugador['Foto'].'"
+        }, ';
+    }
+    ?>
+    );
+
+    tuMano = new Array(<?php echo implode(', ', $tu_mano);?>);
+    
+    var nodoDivCartas = document.createElement("div");
+    tuMano.forEach(carta => {
+        img = new Image();
+        img.src = "cartas/carta" + carta + ".jpg"
+        img.title = "carta"+carta;
+        nodoDivCartas.appendChild(img);
+    });
+    divTusCartas.appendChild(nodoDivCartas);
 
     jugadores.forEach(jugador => {
-        if (jugador.correo == "<?php echo $_SESSION['usuario_correo']?>") {
-            let nodoDiv = document.createElement("div");
-            jugador.cartas.forEach(carta => {
-                let img = new Image();
-                img.src = "cartas/carta" + carta + ".jpg"
-                img.title = "carta"+carta;
-                nodoDiv.appendChild(img);
-            });
-            divTusCartas.appendChild(nodoDiv);
+        let src = jugador.img;
+        jugador.img = new Image();
+        jugador.img.src = src;
+        jugador.img.title = jugador.nombre+" ("+jugador.correo+")";
+
+        if (jugador.correo=="<?php echo $cuentacuentos?>"){
+            jugador.img.classList.add("cuentacuentos");
+            jugador.img.title += " ¡Cuentacuentos!";
+        }else if (jugador.correo=="<?php echo $_SESSION['usuario_correo']?>"){
+            jugador.img.classList.add("tuPerfil");
         }
+
+        divJugadores.appendChild(jugador.img);
+        console.log(jugador.img);
     });
 }
 </script>
 
-
+<div id="jugadores">
+    <h1>Jugadores</h1>
+</div>
 <div id="tusCartas">
+    <h1>Tus Cartas:</h1>
+    <!-- <img id="imgPerfil"> -->
 </div>
 </body>
 </html>

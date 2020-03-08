@@ -1,0 +1,5 @@
+@mixin imagen_perfil($anchura) {
+    width: $anchura;
+    height: $anchura;
+    object-fit: contain;
+}

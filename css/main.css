@@ -3,31 +3,34 @@ h1 {
   text-align: center;
 }
 
-img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
 .importante {
   font-size: 2.5rem;
   text-align: center;
   text-transform: capitalize;
 }
 
-img.perfil-mini {
+.perfil {
+  width: 10vw;
+  height: 10vw;
+  object-fit: contain;
+}
+
+.perfil-mini {
   width: 25px;
   height: 25px;
+  object-fit: contain;
 }
 
-img.perfil-medio {
+.perfil-medio {
   width: 50px;
   height: 50px;
+  object-fit: contain;
 }
 
-img.perfil-grande {
+.perfil-grande {
   width: 100px;
   height: 100px;
+  object-fit: contain;
 }
 
 .pregunta p {
