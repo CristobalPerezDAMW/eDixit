@@ -16,6 +16,10 @@ body {
   width: 10vh;
   height: 10vh;
   object-fit: contain;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  margin: 3px;
   border-radius: 50%;
   border: 1px solid black;
 }
@@ -25,8 +29,7 @@ body {
 }
 
 #jugadores img.cuentacuentos {
-  background-clip: content-box;
-  background-color: yellow;
+  box-shadow: 0 0 0 10px #CCA, 0 0 0 15px #EEC;
 }
 
 #tusCartas {

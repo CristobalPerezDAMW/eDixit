@@ -112,7 +112,7 @@ function init() {
     tuMano.forEach(carta => {
         img = new Image();
         img.src = "cartas/carta" + carta + ".jpg"
-        img.title = "carta"+carta;
+        img.title = "Carta "+carta;
         nodoDivCartas.appendChild(img);
     });
     divTusCartas.appendChild(nodoDivCartas);
