@@ -25,7 +25,7 @@ body {
 }
 
 #jugadores img.tuPerfil {
-  border: 2px solid black;
+  outline: 1px solid black;
 }
 
 #jugadores img.cuentacuentos {
