@@ -71,9 +71,9 @@ require("../../cabecera.php");
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" name="correo_edixit" id="cEmail" aria-describedby="emailHelp">
-            <small id="emailHelp" class="form-text text-muted">Deje el campo en blanco si no quiere cambiar su
-                email</small>
+            <input type="email" class="form-control" name="correo_edixit" id="cEmail" aria-describedby="emailHelp" disabled>
+            <!-- <small id="emailHelp" class="form-text text-muted">Deje el campo en blanco si no quiere cambiar su email</small> -->
+            <small id="emailHelp" class="form-text text-muted">No puede cambiar su correo porque estamos trabajando en ello</small>
         </div>
         <div class="form-group ">
             <label for="contra">Contraseña</label>

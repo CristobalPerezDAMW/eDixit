@@ -12,7 +12,9 @@ if (!isset($imagen) && !isset($nombre) && !isset($correo) && !isset($contra)){
 }
 
 $cambios = false;
-if (!empty($nombre) || !empty($correo) || !empty($contra)) {
+if (!empty($nombre) 
+    // || !empty($correo) 
+    || !empty($contra)) {
     $cambios = true;
     $enlace = mysqli_connect('localhost', 'usuario_dixit', 'jy8-YBk*WV..DVM', 'db_dixit');
 
@@ -24,7 +26,7 @@ if (!empty($nombre) || !empty($correo) || !empty($contra)) {
     } else {
         $sql = 'UPDATE usuarios SET '
         .(empty($nombre)?'':'Nombre=\''.$enlace->real_escape_string($nombre).'\'')
-        .(empty($correo)?'':'Correo=\''.$enlace->real_escape_string($correo).'\'')
+        // .(empty($correo)?'':'Correo=\''.$enlace->real_escape_string($correo).'\'')
         .(empty($contra)?'':'Contra=MD5(\''.$enlace->real_escape_string($contra).'\')')
         .'WHERE Correo=\''.$_SESSION['usuario_correo'].'\''
         ;
@@ -33,8 +35,8 @@ if (!empty($nombre) || !empty($correo) || !empty($contra)) {
         if ($enlace->query($sql) === TRUE) {
             if (!empty($nombre))
                 $_SESSION['usuario_nombre'] = $nombre;
-            if (!empty($correo))
-                $_SESSION['usuario_correo'] = $correo;
+            // if (!empty($correo))
+            //     $_SESSION['usuario_correo'] = $correo;
         } else {
             /*
             https://www.fromdual.com/mysql-error-codes-and-messages
