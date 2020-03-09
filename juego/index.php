@@ -126,7 +126,8 @@ function init() {
         if (jugador.correo=="<?php echo $cuentacuentos?>"){
             jugador.img.classList.add("cuentacuentos");
             jugador.img.title += " ¡Cuentacuentos!";
-        }else if (jugador.correo=="<?php echo $_SESSION['usuario_correo']?>"){
+        }
+        if (jugador.correo=="<?php echo $_SESSION['usuario_correo']?>"){
             jugador.img.classList.add("tuPerfil");
         }
 
@@ -141,7 +142,6 @@ function init() {
 </div>
 <div id="tusCartas">
     <h1>Tus Cartas:</h1>
-    <!-- <img id="imgPerfil"> -->
 </div>
 </body>
 </html>
