@@ -1,4 +1,7 @@
 @charset "UTF-8";
+/*
+sass --watch scss:css
+*/
 h1 {
   text-align: center;
 }

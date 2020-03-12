@@ -112,7 +112,7 @@ if (isset($_SESSION['iniciada'])){
                         echo '<li class="nav-item dropdown '.($esLogin?'disabled':'active').'">';
                         if (isset($_SESSION['iniciada'])){
                             echo '<a class="nav-link dropdown-toggle" href="./#" id="dropdown3" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false"><img class="perfil-mini mr-1" src="'.$foto.'" alt="Tu foto de perfil"/>'.$_SESSION['usuario_nombre'].'</a>';
+                            aria-haspopup="true" aria-expanded="false"><img class="perfil-mini mr-1" src="'.$foto.'?='.filemtime($foto).'" alt="Tu foto de perfil"/>'.$_SESSION['usuario_nombre'].'</a>';
                             echo '
                             <div class="dropdown-menu">
                                 <a class="dropdown-item '.($actual=='/eDixit/usuario/index.php'?'disabled':'').'" href="'.$ruta.'/usuario">Mi perfil</a>

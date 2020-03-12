@@ -1,7 +1,4 @@
 <?php
-    // require('cabecera.php');
-?>
-<?php
 // var_dump($_SERVER);
 // die();
 session_start();
@@ -24,7 +21,7 @@ function rutaFoto($correo){
     return '../imgs/sin_foto.png';
 }
 
-// Acceso a la base de datos xD
+// Acceso a la base de datos
 
 $bbdd = @mysqli_connect('localhost', 'usuario_dixit', 'jy8-YBk*WV..DVM', 'db_dixit');
 $error = false;
@@ -33,14 +30,14 @@ if (!$bbdd){
     $error = 'La base de datos no está disponible<br>Sentimos las molestias';
 } else {
 
-    // Datos privados del Jugador en cuestión
-    $sql = 'SELECT Mano, Cuentacuentos FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
-    // die($sql);
+    // Datos privados del Jugador en cuestión y la partida
+    $sql = 'SELECT Mano, Cuentacuentos, Estado FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
     $resultado = $bbdd->query($sql);
 
     while (($fila = mysqli_fetch_array($resultado))){
         $tu_mano = explode(':', $fila[0]);
         $cuentacuentos = $fila[1];
+        $estado = $fila[2];
     }
     $resultado->free();
 
@@ -81,6 +78,7 @@ if (!$bbdd){
 
 <body onload="init()">
 <?php
+die($estado);
     if ($error){
         die('<p class="error">'.$error.'</p>');
     } else if (!$jugadores){
@@ -90,25 +88,27 @@ if (!$bbdd){
 <script>
 var body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano;
 
+jugadores = new Array(
+<?php
+foreach ($jugadores as $correo => $jugador) {
+    echo '{
+        nombre: "'.$jugador['Nombre'].'",
+        correo: "'.$correo.'",
+        img: "'.$jugador['Foto'].'"
+    }, ';
+}
+?>
+);
+
+tuMano = new Array(<?php echo implode(', ', $tu_mano);?>);
+    
+
 function init() {
     body = document.body;
     divTusCartas = document.getElementById("tusCartas");
     divJugadores = document.getElementById("jugadores");
-    jugadores = new Array(
-    <?php
-    foreach ($jugadores as $correo => $jugador) {
-        echo '{
-            nombre: "'.$jugador['Nombre'].'",
-            correo: "'.$correo.'",
-            img: "'.$jugador['Foto'].'"
-        }, ';
-    }
-    ?>
-    );
-
-    tuMano = new Array(<?php echo implode(', ', $tu_mano);?>);
-    
     var nodoDivCartas = document.createElement("div");
+
     tuMano.forEach(carta => {
         img = new Image();
         img.src = "cartas/carta" + carta + ".jpg"
