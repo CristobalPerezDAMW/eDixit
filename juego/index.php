@@ -143,12 +143,13 @@ function init() {
 </script>
 
 <div id="jugadores">
-    <h1>Jugadores</h1>
+    <!-- <h1>Jugadores</h1> -->
 </div>
 <div id="tablero">
+    <img src="cartas/carta1.jpg" alt="xd">
 </div>
 <div id="tusCartas">
-    <h1>Tus Cartas:</h1>
+    <!-- <h1>Tus Cartas:</h1> -->
 </div>
 </body>
 </html>

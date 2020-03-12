@@ -6,11 +6,17 @@ body {
   align-items: stretch;
   border: 0px;
   margin: 0px;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 #jugadores {
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
+  font-size: 0.8rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 #jugadores img {
@@ -65,6 +71,13 @@ body {
 #tablero {
   background-color: red;
   height: 100%;
+  max-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#tablero * {
+  max-height: 100%;
 }
 
 .error {
