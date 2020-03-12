@@ -1,6 +1,7 @@
 // sass --watch scss:css
 @import "../scss/compartido";
 body {
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: stretch;
@@ -37,8 +38,8 @@ body {
 }
 
 #tusCartas {
-    position: absolute;
-    bottom: 0;
+    // position: absolute;
+    // bottom: 0;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -69,11 +70,14 @@ body {
     }
 }
 
-canvas {
-    border: 0px;
-    // width: 100%;
+#tablero {
+    background-color: red;
+    height: 100%;
 }
 
+// canvas {
+//     border: 0px;
+// }
 .error {
     width: 100%;
     padding: 10px;

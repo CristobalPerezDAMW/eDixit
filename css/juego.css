@@ -1,4 +1,5 @@
 body {
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: stretch;
@@ -33,8 +34,6 @@ body {
 }
 
 #tusCartas {
-  position: absolute;
-  bottom: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -63,8 +62,9 @@ body {
   text-align: center;
 }
 
-canvas {
-  border: 0px;
+#tablero {
+  background-color: red;
+  height: 100%;
 }
 
 .error {

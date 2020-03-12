@@ -1,6 +1,12 @@
 <?php
-// var_dump($_SERVER);
-// die();
+/* Estados del juego:
+    "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
+    "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
+    "PensandoCartas:X": El cuentacuentos ha elegido carta y ahora la están eligiendo los demás jugadores. Quedan X jugadores por elegir carta
+    "Votacion:X": Los jugadores están votando qué carta creen que es del cuentacuentos. Quedan X jugadores por votar
+    "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
+*/
+
 session_start();
 if (!isset($_SESSION['iniciada'])){
     header("Location: ../login");
@@ -65,15 +71,12 @@ if (!$bbdd){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
     <?php
-    echo '
-        <link rel="stylesheet" href="'.$ruta.'/css/juego.css">
-        <link rel="shortcut icon" href="'.$ruta.'/imgs/edixit-logo.png">
+    echo '<link rel="stylesheet" href="'.$ruta.'/css/juego.css">
+    <link rel="shortcut icon" href="'.$ruta.'/imgs/edixit-logo.png">
+    <title>Dixit Electrónico - '.$_SESSION['usuario_nombre'].'</title>
     ';
     ?>
-
-    <?php echo '<title>Dixit Electrónico - '.$_SESSION['usuario_nombre'].'</title>'; ?>
 </head>
 
 <body onload="init()">
@@ -141,6 +144,8 @@ function init() {
 
 <div id="jugadores">
     <h1>Jugadores</h1>
+</div>
+<div id="tablero">
 </div>
 <div id="tusCartas">
     <h1>Tus Cartas:</h1>
