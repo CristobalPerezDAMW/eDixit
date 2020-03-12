@@ -137,13 +137,13 @@ function init() {
         }
 
         divJugadores.appendChild(jugador.img);
-        console.log(jugador.img);
+        // console.log(jugador.img);
     });
 }
 </script>
 
 <div id="jugadores">
-    <!-- <h1>Jugadores</h1> -->
+    <h1>Jugadores</h1>
 </div>
 <div id="tablero">
     <img src="cartas/carta1.jpg" alt="xd">
