@@ -78,7 +78,7 @@ if (!$bbdd){
 
 <body onload="init()">
 <?php
-die($estado);
+    // die($estado);
     if ($error){
         die('<p class="error">'.$error.'</p>');
     } else if (!$jugadores){
@@ -86,7 +86,9 @@ die($estado);
     }
 ?>
 <script>
-var body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano;
+var body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano, estadoJuego;
+
+estadoJuego = "<?php echo $estado ?>";
 
 jugadores = new Array(
 <?php
