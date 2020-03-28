@@ -79,7 +79,8 @@ if (!$bbdd){
     ?>
 </head>
 
-<body onload="init()">
+<body>
+<!-- <body onload="init()"> -->
 <?php
     // die($estado);
     if ($error){
@@ -89,7 +90,70 @@ if (!$bbdd){
     }
 ?>
 <script>
-var body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano, estadoJuego;
+// Crear evento compatible con múltiples navegadores
+var crearEvento = (function() {
+    function w3c_crearEvento(elemento, evento, mifuncion) {
+        elemento.addEventListener(evento, mifuncion, false);
+    }
+
+    function ie_crearEvento(elemento, evento, mifuncion) {
+        var fx = function() {
+            mifuncion.call(elemento);
+        };
+        elemento.attachEvent("on" + evento, fx);
+    }
+    if (typeof window.addEventListener !== "undefined") {
+        return w3c_crearEvento;
+    } else if (typeof window.attachEvent !== "undefined") {
+        return ie_crearEvento;
+    }
+})();
+
+//AJAX
+function objetoXHR() {
+    if (window.XMLHttpRequest) {
+        return new XMLHttpRequest();
+    } else if (window.ActiveXObject) {
+        var versionesIE = new Array(
+            "Msxml2.XMLHTTP.5.0",
+            "Msxml2.XMLHTTP.4.0",
+            "Msxml2.XMLHTTP.3.0",
+            "Msxml2.XMLHTTP",
+            "Microsoft.XMLHTTP"
+        );
+        for (var i = 0; i < versionesIE.length; i++) {
+            try {
+                return new ActiveXObject(versionesIE[i]);
+            } catch (errorControlado) {}
+        }
+    }
+    throw new Error("No se pudo crear el objeto XMLHttpRequest");
+}
+function cargarAsync(url) {
+    if (miXHR) {
+        document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
+        miXHR.open('GET', url, true);
+        miXHR.onreadystatechange = estadoPeticion;
+        miXHR.send(null);
+    }
+}
+function estadoPeticion() {
+    if (this.readyState == 4 && this.status == 200) {
+        var resultados = eval('(' + this.responseText + ')');
+        texto = "<table border=1><tr><th>Nombre Centro </th><th>Localidad</th> <th> Provincia </th><th>Telefono</th> <th> Fecha Visita </th><th>Numero Visitantes</th> </tr>";
+        for (var i = 0; i < resultados.length; i++) {
+            objeto = resultados[i];
+            texto += "<tr><td>" + objeto.nombrecentro + "</td><td>" +
+                objeto.localidad + "</td><td>" + objeto.provincia + "</td><td>" +
+                objeto.telefono + "</td><td>" + objeto.fechavisita + "</td><td>" +
+                objeto.numvisitantes + "</td></tr>";
+        }
+        document.getElementById("indicador").innerHTML = "";
+        document.getElementById("resultados").innerHTML = texto;
+    }
+}
+
+var ajaxXHR, body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano, estadoJuego;
 
 estadoJuego = "<?php echo $estado ?>";
 
@@ -105,10 +169,13 @@ foreach ($jugadores as $correo => $jugador) {
 ?>
 );
 
-tuMano = new Array(<?php echo implode(', ', $tu_mano);?>);
+tuMano = new Array(<?php echo implode(',', $tu_mano);?>);
     
+crearEvento(window, "load", init);
 
 function init() {
+    miXHR = new objetoXHR();
+    
     body = document.body;
     divTusCartas = document.getElementById("tusCartas");
     divJugadores = document.getElementById("jugadores");
@@ -141,6 +208,9 @@ function init() {
     });
 }
 </script>
+<div id="indicadorAJAX">
+    <!-- <img src='imgs/ajax-loading.gif'/> -->
+</div>
 
 <div id="jugadores">
     <h1>Jugadores</h1>

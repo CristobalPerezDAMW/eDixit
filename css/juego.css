@@ -89,4 +89,10 @@ body {
   text-align: center;
 }
 
+#indicadorAJAX {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
 /*# sourceMappingURL=juego.css.map */
