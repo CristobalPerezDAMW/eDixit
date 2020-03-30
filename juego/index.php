@@ -29,7 +29,8 @@ function rutaFoto($correo){
 
 // Acceso a la base de datos
 
-$bbdd = @mysqli_connect('localhost', 'usuario_dixit', 'jy8-YBk*WV..DVM', 'db_dixit');
+require($ruta.'/bbdd.php');
+$enlace = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
 $error = false;
 $jugadores = false;
 if (!$bbdd){
