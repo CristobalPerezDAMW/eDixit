@@ -10,13 +10,14 @@ if (!$_SESSION['verificada']){
 if (!isset($imagen) && !isset($nombre) && !isset($correo) && !isset($contra)){
     die('Error interno c0002');
 }
+require($ruta.'/bbdd.php');
 
 $cambios = false;
 if (!empty($nombre) 
     // || !empty($correo) 
     || !empty($contra)) {
     $cambios = true;
-    $enlace = mysqli_connect('localhost', 'usuario_dixit', 'jy8-YBk*WV..DVM', 'db_dixit');
+    $enlace = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
 
     if (!$enlace) {
         echo "Error: No se pudo conectar a MySQL." . PHP_EOL;

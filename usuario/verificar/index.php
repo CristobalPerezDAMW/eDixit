@@ -3,7 +3,8 @@
     if (!isset($_GET['verificacion'], $_GET['correo'])){
         header('Location: ..');
     }
-    $enlace = mysqli_connect('localhost', 'usuario_dixit', 'jy8-YBk*WV..DVM', 'db_dixit');
+    require('../../bbdd.php');
+    $enlace = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
     
     $cod = $enlace->real_escape_string($_GET['verificacion']);
     $correo = urldecode($_GET['correo']);
