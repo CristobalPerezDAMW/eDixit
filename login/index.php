@@ -20,7 +20,7 @@ require("../cabecera.php");
         <form method="POST">
             <div class="form-group">
                 <label for="usuario">Correo</label>
-                <input type="text" class="form-control" name="correo_edixit" id="usuario" required>
+                <input type="text" class="form-control" name="correo_edixit" id="usuario" <?php if (isset($malUsuario)) echo $malUsuario; ?> required>
             </div>
             <div class="form-group ">
                 <label for="contra">Contraseña</label>

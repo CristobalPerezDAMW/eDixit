@@ -20,6 +20,7 @@ if (!$enlace) {
     if ($consulta) {
         if (mysqli_num_rows($consulta)==0){
             $error = 'Usuario o contraseña incorrectos';
+            $malUsuario = $usuario;
         }else {
             $obj = $consulta->fetch_object();
             $_SESSION['usuario_correo'] = $usuario;
