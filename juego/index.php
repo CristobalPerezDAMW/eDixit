@@ -87,7 +87,7 @@ if (!$bbdd){
     if ($error){
         die('<p class="error">'.$error.'</p>');
     } else if (!$jugadores){
-        die('<p class="error">No estás en ninguna partida zopenco</p>');
+        die('<p class="error">No estás en ninguna partida</p><br><p class="error">Normalmente te sacaría de nuevo al menú pero necesito saber cuándo pasa esto.</p>');
     }
 ?>
 <script>
@@ -217,7 +217,7 @@ function init() {
     <h1>Jugadores</h1>
 </div>
 <div id="tablero">
-    <img src="cartas/carta1.jpg" alt="xd">
+    <!-- <img src="cartas/carta1.jpg" alt="xd"> -->
 </div>
 <div id="tusCartas">
     <!-- <h1>Tus Cartas:</h1> -->
