@@ -154,7 +154,7 @@ function estadoPeticion() {
     }
 }
 
-var ajaxXHR, body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano, estadoJuego;
+var ajaxXHR, body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano, estadoJuego, divMensajes, mensaje1, mensaje2;
 
 estadoJuego = "<?php echo $estado ?>";
 
@@ -180,6 +180,9 @@ function init() {
     body = document.body;
     divTusCartas = document.getElementById("tusCartas");
     divJugadores = document.getElementById("jugadores");
+    divMensajes = document.getElementById("mensajes");
+    mensaje1 = document.getElementById("mensaje1");
+    mensaje2 = document.getElementById("mensaje2");
     var nodoDivCartas = document.createElement("div");
 
     tuMano.forEach(carta => {
@@ -207,6 +210,29 @@ function init() {
         divJugadores.appendChild(jugador.img);
         // console.log(jugador.img);
     });
+
+    
+    /* Estados del juego:
+        "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
+        "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
+        "PensandoCartas:X": El cuentacuentos ha elegido carta y ahora la están eligiendo los demás jugadores. Quedan X jugadores por elegir carta
+        "Votacion:X": Los jugadores están votando qué carta creen que es del cuentacuentos. Quedan X jugadores por votar
+        "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
+    */
+    if (estadoJuego == "Inicio"){
+        divMensajes.classList.remove("quitar")
+        // divMensajes.classList.add("quitar")
+        mensaje1.innerHTML = "Fase Inicial";
+        mensaje2.innerHTML = "El primero en poner carta es el primer cuentacuentos";
+    } else if (estadoJuego == "PensandoCC"){
+        divMensajes.classList.remove("quitar")
+        // divMensajes.classList.add("quitar")
+        mensaje1.innerHTML = "Fase Inicial";
+        mensaje2.innerHTML = "El primero en poner carta es el primer cuentacuentos";
+    } else {
+        divMensajes.classList.remove("quitar")
+        divMensajes.classList.add("quitar")
+    }
 }
 </script>
 <div id="indicadorAJAX">
@@ -217,6 +243,10 @@ function init() {
     <h1>Jugadores</h1>
 </div>
 <div id="tablero">
+    <div id="mensajes">
+        <p id="mensaje1"></p>
+        <p id="mensaje2"></p>
+    </div>
     <!-- <img src="cartas/carta1.jpg" alt="xd"> -->
 </div>
 <div id="tusCartas">
