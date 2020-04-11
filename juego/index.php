@@ -53,9 +53,10 @@ if (!$bbdd){
     // die($sql);
     $resultado = $bbdd->query($sql);
 
-    while (($fila = mysqli_fetch_array($resultado))){
+    for($cont=0; ($fila = mysqli_fetch_array($resultado)); $cont++){
         if ($fila[1]==$_SESSION['usuario_correo']){
             $tu_mano = explode(':', $fila[3]);
+            $jugador_indice = $cont;
         }
         $jugadores[$fila[1]] = array('Nombre'=>$fila[0], 'Posicion'=>$fila[2], 'Foto'=>rutaFoto($fila[1]));
     }
@@ -157,6 +158,8 @@ function estadoPeticion() {
 var ajaxXHR, body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano, estadoJuego, divMensajes, mensaje1, mensaje2;
 
 estadoJuego = "<?php echo $estado ?>";
+cuentacuentos = "<?php echo $cuentacuentos ?>";
+jugadorIndice = "<?php echo $jugador_indice ?>";
 
 jugadores = new Array(
 <?php
@@ -171,7 +174,7 @@ foreach ($jugadores as $correo => $jugador) {
 );
 
 tuMano = new Array(<?php echo implode(',', $tu_mano);?>);
-    
+
 crearEvento(window, "load", init);
 
 function init() {
@@ -185,21 +188,13 @@ function init() {
     mensaje2 = document.getElementById("mensaje2");
     var nodoDivCartas = document.createElement("div");
 
-    tuMano.forEach(carta => {
-        img = new Image();
-        img.src = "cartas/carta" + carta + ".jpg"
-        img.title = "Carta "+carta;
-        nodoDivCartas.appendChild(img);
-    });
-    divTusCartas.appendChild(nodoDivCartas);
-
     jugadores.forEach(jugador => {
         let src = jugador.img;
         jugador.img = new Image();
         jugador.img.src = src;
         jugador.img.title = jugador.nombre+" ("+jugador.correo+")";
 
-        if (jugador.correo=="<?php echo $cuentacuentos?>"){
+        if (jugador.correo==cuentacuentos){
             jugador.img.classList.add("cuentacuentos");
             jugador.img.title += " ¡Cuentacuentos!";
         }
@@ -219,20 +214,44 @@ function init() {
         "Votacion:X": Los jugadores están votando qué carta creen que es del cuentacuentos. Quedan X jugadores por votar
         "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
     */
+   var eligeCarta = false;
     if (estadoJuego == "Inicio"){
-        divMensajes.classList.remove("quitar")
-        // divMensajes.classList.add("quitar")
+        divMensajes.classList.remove("quitar");
+        // divMensajes.classList.add("quitar");
         mensaje1.innerHTML = "Fase Inicial";
         mensaje2.innerHTML = "El primero en poner carta es el primer cuentacuentos";
+        eligeCarta = true;
     } else if (estadoJuego == "PensandoCC"){
-        divMensajes.classList.remove("quitar")
-        // divMensajes.classList.add("quitar")
-        mensaje1.innerHTML = "Fase Inicial";
-        mensaje2.innerHTML = "El primero en poner carta es el primer cuentacuentos";
+        divMensajes.classList.remove("quitar");
+        if (cuentacuentos == jugadores[jugadorIndice].correo){
+            mensaje1.innerHTML = "Eres el Cuentacuentos";
+            mensaje2.innerHTML = "Te toca elegir carta. Recuerda no pensar en una pista demasiado fácil.";
+            eligeCarta = true;
+        } else {
+            mensaje1.innerHTML = "Esperando al Cuentacuentos";
+            mensaje2.innerHTML = "El cuentacuentos está pensando qué carta elegir";
+        }
     } else {
-        divMensajes.classList.remove("quitar")
-        divMensajes.classList.add("quitar")
+        divMensajes.classList.remove("quitar");
+        divMensajes.classList.add("quitar");
     }
+
+    function elegirCarta(carta, indice){
+        // tuMano[indice].classList.add("quitar");
+        alert("hola, has seleccionado la carta num "+indice+", que es la "+carta);
+    }
+
+    function foreachMano(item, index){
+        img = new Image();
+        img.src = "cartas/carta" + item + ".jpg"
+        img.title = "Carta "+item;
+        if (eligeCarta){
+            crearEvento(img, "click", function() { elegirCarta(item, index) });
+        }
+        nodoDivCartas.appendChild(img);
+    }
+    tuMano.forEach(foreachMano);
+    divTusCartas.appendChild(nodoDivCartas);
 }
 </script>
 <div id="indicadorAJAX">
