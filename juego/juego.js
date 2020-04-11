@@ -63,23 +63,7 @@ function estadoPeticion() {
     }
 }
 
-var ajaxXHR, body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano, estadoJuego, divMensajes, mensaje1, mensaje2;
-
-estadoJuego = "<?php echo $estado ?>";
-
-jugadores = new Array(
-    <?php
-foreach ($jugadores as $correo => $jugador) {
-    echo '{
-        nombre: "'.$jugador['Nombre'].'",
-        correo: "'.$correo.'",
-        img: "'.$jugador['Foto'].'"
-    }, ';
-}
-?>
-);
-
-tuMano = new Array(<?php echo implode(',', $tu_mano);?>);
+var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2;
 
 crearEvento(window, "load", init);
 
@@ -94,32 +78,23 @@ function init() {
     mensaje2 = document.getElementById("mensaje2");
     var nodoDivCartas = document.createElement("div");
 
-    tuMano.forEach(carta => {
-        img = new Image();
-        img.src = "cartas/carta" + carta + ".jpg"
-        img.title = "Carta " + carta;
-        nodoDivCartas.appendChild(img);
-    });
-    divTusCartas.appendChild(nodoDivCartas);
-
     jugadores.forEach(jugador => {
         let src = jugador.img;
         jugador.img = new Image();
         jugador.img.src = src;
         jugador.img.title = jugador.nombre + " (" + jugador.correo + ")";
 
-        if (jugador.correo == "<?php echo $cuentacuentos?>") {
+        if (jugador.correo == cuentacuentos) {
             jugador.img.classList.add("cuentacuentos");
             jugador.img.title += " ¡Cuentacuentos!";
         }
-        if (jugador.correo == "<?php echo $_SESSION['usuario_correo']?>") {
+        if (jugador.correo == jugadores[jugadorIndice].correo) {
             jugador.img.classList.add("tuPerfil");
         }
 
         divJugadores.appendChild(jugador.img);
         // console.log(jugador.img);
     });
-
 
     /* Estados del juego:
         "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
@@ -128,18 +103,42 @@ function init() {
         "Votacion:X": Los jugadores están votando qué carta creen que es del cuentacuentos. Quedan X jugadores por votar
         "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
     */
+    var eligeCarta = false;
     if (estadoJuego == "Inicio") {
-        divMensajes.classList.remove("quitar")
-            // divMensajes.classList.add("quitar")
+        divMensajes.classList.remove("quitar");
+        // divMensajes.classList.add("quitar");
         mensaje1.innerHTML = "Fase Inicial";
         mensaje2.innerHTML = "El primero en poner carta es el primer cuentacuentos";
-    } else if (estadoJuego == "PensandoCC" && cuentacuentos) {
-        divMensajes.classList.remove("quitar")
-            // divMensajes.classList.add("quitar")
-        mensaje1.innerHTML = "Esperando al Cuentacuentos";
-        mensaje2.innerHTML = "El cuentacuentos está pensando qué carta elegir";
+        eligeCarta = true;
+    } else if (estadoJuego == "PensandoCC") {
+        divMensajes.classList.remove("quitar");
+        if (cuentacuentos == jugadores[jugadorIndice].correo) {
+            mensaje1.innerHTML = "Eres el Cuentacuentos";
+            mensaje2.innerHTML = "Te toca elegir carta. Recuerda no pensar en una pista demasiado fácil.";
+            eligeCarta = true;
+        } else {
+            mensaje1.innerHTML = "Esperando al Cuentacuentos";
+            mensaje2.innerHTML = "El cuentacuentos está pensando qué carta elegir";
+        }
     } else {
-        divMensajes.classList.remove("quitar")
-        divMensajes.classList.add("quitar")
+        divMensajes.classList.remove("quitar");
+        divMensajes.classList.add("quitar");
     }
+
+    function elegirCarta(carta, indice) {
+        // tuMano[indice].classList.add("quitar");
+        alert("hola, has seleccionado la carta num " + indice + ", que es la " + carta);
+    }
+
+    function foreachMano(item, index) {
+        img = new Image();
+        img.src = "cartas/carta" + item + ".jpg"
+        img.title = "Carta " + item;
+        if (eligeCarta) {
+            crearEvento(img, "click", function() { elegirCarta(item, index) });
+        }
+        nodoDivCartas.appendChild(img);
+    }
+    tuMano.forEach(foreachMano);
+    divTusCartas.appendChild(nodoDivCartas);
 }

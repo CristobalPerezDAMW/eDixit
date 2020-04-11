@@ -1,4 +1,5 @@
 <?php
+// Destáquese que todos los comentarios desaparecerán en las versiones de producción
 /* Estados del juego:
     "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
     "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
@@ -91,7 +92,30 @@ if (!$bbdd){
         die('<p class="error">No estás en ninguna partida</p><br><p class="error">Normalmente te sacaría de nuevo al menú pero necesito saber cuándo pasa esto.</p>');
     }
 ?>
+
 <script>
+// Para escribir desde php
+var jugadores = new Array(
+<?php
+foreach ($jugadores as $correo => $jugador) {
+    echo '{
+        nombre: "'.$jugador['Nombre'].'",
+        correo: "'.$correo.'",
+        img: "'.$jugador['Foto'].'"
+    }, ';
+}
+?>
+);
+
+var tuMano = new Array(<?php echo implode(',', $tu_mano);?>);
+
+var estadoJuego = "<?php echo $estado ?>";
+var cuentacuentos = "<?php echo $cuentacuentos ?>";
+var jugadorIndice = "<?php echo $jugador_indice ?>";
+</script>
+
+<script src="juego.js" type="text/javascript"></script>
+<!-- <script>
 // Crear evento compatible con múltiples navegadores
 var crearEvento = (function() {
     function w3c_crearEvento(elemento, evento, mifuncion) {
@@ -155,25 +179,7 @@ function estadoPeticion() {
     }
 }
 
-var ajaxXHR, body, divTusCartas, divJugadores, jugadores, imgPerfil, tuMano, estadoJuego, divMensajes, mensaje1, mensaje2;
-
-estadoJuego = "<?php echo $estado ?>";
-cuentacuentos = "<?php echo $cuentacuentos ?>";
-jugadorIndice = "<?php echo $jugador_indice ?>";
-
-jugadores = new Array(
-<?php
-foreach ($jugadores as $correo => $jugador) {
-    echo '{
-        nombre: "'.$jugador['Nombre'].'",
-        correo: "'.$correo.'",
-        img: "'.$jugador['Foto'].'"
-    }, ';
-}
-?>
-);
-
-tuMano = new Array(<?php echo implode(',', $tu_mano);?>);
+var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2;
 
 crearEvento(window, "load", init);
 
@@ -198,7 +204,7 @@ function init() {
             jugador.img.classList.add("cuentacuentos");
             jugador.img.title += " ¡Cuentacuentos!";
         }
-        if (jugador.correo=="<?php echo $_SESSION['usuario_correo']?>"){
+        if (jugador.correo==jugadores[jugadorIndice].correo){
             jugador.img.classList.add("tuPerfil");
         }
 
@@ -206,7 +212,6 @@ function init() {
         // console.log(jugador.img);
     });
 
-    
     /* Estados del juego:
         "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
         "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
@@ -253,7 +258,8 @@ function init() {
     tuMano.forEach(foreachMano);
     divTusCartas.appendChild(nodoDivCartas);
 }
-</script>
+</script> -->
+<noscript>Su navegador no puede ejecutar este juego, disculpe las molestias.</noscript>
 <div id="indicadorAJAX">
     <!-- <img src='imgs/ajax-loading.gif'/> -->
 </div>
