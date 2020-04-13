@@ -16,7 +16,8 @@ require("../cabecera.php");
 ?>
 <div class="container">
     <fieldset>
-        <legend class="ml-2">Introduce tus datos</legend>
+        <!-- <legend class="ml-2">Introduce tus datos</legend> -->
+        <legend class="ml-2">Iniciar Sesión</legend>
         <form method="POST">
             <div class="form-group">
                 <label for="usuario">Correo</label>
