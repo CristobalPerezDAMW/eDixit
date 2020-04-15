@@ -1,4 +1,7 @@
-// sass --watch scss:css
+/*
+sass --watch scss:css
+*/
+
 @import "../scss/compartido";
 body {
     height: 100vh;
@@ -65,9 +68,11 @@ body {
     flex-direction: column;
     // border: 1px solid red;
     >div {
+        background-color: yellow;
+        min-height: 20vh;
         max-width: 100%;
         display: flex;
-        justify-content: space-evenly;
+        justify-content: center;
         flex-wrap: wrap;
         // border: 1px solid green;
         >img {
@@ -81,7 +86,8 @@ body {
             margin: 1%;
             transition: all .2s;
         }
-        >img:hover {
+        >img:hover,
+        >img:active {
             transform: scale(2);
             transform-origin: 50% 100%;
         }
@@ -118,6 +124,7 @@ body {
 }
 
 #mensajes {
+    max-height: 10vh;
     // background-color: blue;
     display: flex;
     flex-direction: column;
@@ -127,16 +134,46 @@ body {
 
 #mensaje1 {
     display: block;
-    font-size: 3rem;
+    font-size: 0.90rem;
     // background-color: yellow;
     text-align: center;
 }
 
 #mensaje2 {
     display: block;
-    font-size: 2rem;
+    font-size: 0.75rem;
     // background-color: green;
     text-align: center;
+}
+
+@media only screen and (min-width: 400px) and (min-height: 400px),
+screen and (min-height: 400px) {
+    #mensaje1 {
+        font-size: 1rem;
+    }
+    #mensaje2 {
+        font-size: 0.75rem;
+    }
+}
+
+@media only screen and (min-width: 700px) and (min-height: 700px),
+screen and (min-height: 700px) {
+    #mensaje1 {
+        font-size: 2rem;
+    }
+    #mensaje2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media only screen and (min-width: 900px) and (min-height: 900px),
+screen and (min-height: 900px) {
+    #mensaje1 {
+        font-size: 3rem;
+    }
+    #mensaje2 {
+        font-size: 2rem;
+    }
 }
 
 // Utilidades
