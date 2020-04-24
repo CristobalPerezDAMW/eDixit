@@ -32,6 +32,7 @@ body {
   font-size: 0.8rem;
   margin-top: 10px;
   margin-bottom: 10px;
+  min-height: min-content;
 }
 
 #jugadores img {
@@ -44,6 +45,9 @@ body {
   margin: 3px;
   border-radius: 50%;
   border: 1px solid black;
+  margin-left: 5px;
+  margin-bottom: 5px;
+  overflow-x: auto;
 }
 
 #jugadores img.tuPerfil {
@@ -123,39 +127,49 @@ body {
   display: block;
   font-size: 0.9rem;
   text-align: center;
+  text-shadow: 0px 0px 3px #fff;
+  font-weight: bolder;
 }
 
 #mensaje2 {
   display: block;
   font-size: 0.75rem;
   text-align: center;
+  text-shadow: 0px 0px 3px #fff;
+  font-weight: bolder;
 }
 
 @media only screen and (min-width: 400px) and (min-height: 400px), screen and (min-height: 400px) {
   #mensaje1 {
-    font-size: 1rem;
+    font-size: 1.3rem;
+    font-weight: bolder;
   }
 
   #mensaje2 {
-    font-size: 0.75rem;
+    font-size: 1rem;
+    font-weight: bolder;
   }
 }
 @media only screen and (min-width: 700px) and (min-height: 700px), screen and (min-height: 700px) {
   #mensaje1 {
     font-size: 2rem;
+    font-weight: bold;
   }
 
   #mensaje2 {
     font-size: 1.5rem;
+    font-weight: bold;
   }
 }
 @media only screen and (min-width: 900px) and (min-height: 900px), screen and (min-height: 900px) {
   #mensaje1 {
     font-size: 3rem;
+    font-weight: bold;
   }
 
   #mensaje2 {
     font-size: 2rem;
+    font-weight: bold;
   }
 }
 .quitar {

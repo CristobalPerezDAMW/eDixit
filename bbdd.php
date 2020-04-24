@@ -6,11 +6,19 @@ $BBDD = (object) array(
     'contra' => 'jy8-YBk*WV..DVM',
     'bbdd' => 'db_dixit'
 );
-*/
+
 $BBDD = (object) array(
     'usuario' => 'cristobal',
     'servidor' => 'localhost',
     'contra' => 'cristobal',
+    'bbdd' => 'cristobal'
+);
+*/
+
+$BBDD = (object) array(
+    'usuario' => 'cristobal',
+    'servidor' => 'localhost',
+    'contra' => 'OLmPQa5KMd',
     'bbdd' => 'cristobal'
 );
 ?>

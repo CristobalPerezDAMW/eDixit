@@ -16,6 +16,10 @@ $ruta = '..';
 include($ruta.'/definiciones.php');
 require($ruta.'/bbdd.php');
 
+if (isset($_GET['getEstadoPartida'])){
+    die("Hostias");
+}
+
 $foto = $ruta.'/perfiles/'.parsearNombreArchivo($_SESSION['usuario_correo']).'.foto';
 if (!is_file($foto)){
     $foto = $ruta.'/imgs/sin_foto.png';
@@ -112,6 +116,9 @@ var tuMano = new Array(<?php echo implode(',', $tu_mano);?>);
 var estadoJuego = "<?php echo $estado ?>";
 var cuentacuentos = "<?php echo $cuentacuentos ?>";
 var jugadorIndice = "<?php echo $jugador_indice ?>";
+
+//AJAX URLs
+var urlGetEstado = "<?php echo $_SERVER['PHP_SELF'] ?>";
 </script>
 
 <script src="juego.js" type="text/javascript"></script>
@@ -121,7 +128,7 @@ var jugadorIndice = "<?php echo $jugador_indice ?>";
 </div>
 
 <div id="jugadores">
-    <h1>Jugadores</h1>
+    <!-- <h1>Jugadores</h1> -->
 </div>
 <div id="tablero">
     <div id="mensajes">

@@ -13,7 +13,13 @@ if (isset($_SESSION['iniciada'])){
     }
 } 
 require("../cabecera.php");
+
+//Mensaje Importante!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ?>
+<div class="container-fluid bg-primary text-primary-text pt-3 pb-2 mt-1 mb-5">
+    <p class="mensaje_importante">Debido a problemas recientes es posible que si creó su cuenta de usuario en el último mes deba crear su cuenta de nuevo.<br>Disculpe las molestias</p>
+</div>
+
 <div class="container">
     <fieldset>
         <!-- <legend class="ml-2">Introduce tus datos</legend> -->

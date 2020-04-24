@@ -39,6 +39,11 @@ h1 {
     text-transform: capitalize;
 }
 
+.mensaje_importante {
+    font-size: $font-size-lg * 2;
+    text-align: center;
+}
+
 .perfil {
     @include imagen_perfil(10vw);
 }

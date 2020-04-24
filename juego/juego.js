@@ -38,12 +38,12 @@ function objetoXHR() {
     throw new Error("No se pudo crear el objeto XMLHttpRequest");
 }
 
-function cargarAsync(url) {
-    if (miXHR) {
+function getAsync(url) {
+    if (ajaxXHR) {
         document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
-        miXHR.open('GET', url, true);
-        miXHR.onreadystatechange = estadoPeticion;
-        miXHR.send(null);
+        ajaxXHR.open('GET', url, true);
+        ajaxXHR.onreadystatechange = estadoPeticion;
+        ajaxXHR.send(null);
     }
 }
 
@@ -68,7 +68,7 @@ var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1,
 crearEvento(window, "load", init);
 
 function init() {
-    miXHR = new objetoXHR();
+    ajaxXHR = new objetoXHR();
 
     body = document.body;
     divTusCartas = document.getElementById("tusCartas");
@@ -141,4 +141,32 @@ function init() {
     }
     tuMano.forEach(foreachMano);
     divTusCartas.appendChild(nodoDivCartas);
+
+    //Hilo que comprueba si cambia el estado de la partida
+    // if (typeof(Worker) !== "undefined") {
+    //     // Se puede con Web Worker
+    //     var worker;
+
+    //     function startWorker() {
+    //         if (typeof(worker) == "undefined") {
+    //             worker = new Worker("worker_estado_partida.js");
+    //         }
+    //         worker.postMessage(new Array(urlGetEstado));
+    //         worker.onmessage = function(event) {
+    //             alert(event.data);
+    //         };
+    //     }
+
+    //     function stopWorker() {
+    //         worker.terminate();
+    //         worker = undefined;
+    //     }
+
+    //     startWorker();
+    // } else {
+    //     // No se puede con Web Worker
+    // }
+    executeAsync(function() {
+        getAsync(urlGetEstado + "?getEstadoPartida=true");
+    });
 }
