@@ -42,18 +42,18 @@ function getAsync(url) {
     if (ajaxXHR) {
         document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
         ajaxXHR.open('GET', url, true);
-        ajaxXHR.onreadystatechange = estadoPeticion;
+        ajaxXHR.onreadystatechange = enPeticionLista;
         ajaxXHR.send(null);
     }
 }
 
-function estadoPeticion() {
+function enPeticionLista() {
     if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("indicadorAJAX").innerHTML = "";
         if (estadoJuego != this.responseText) {
             estadoJuego = this.responseText;
             ponerEstado();
         }
-        document.getElementById("indicadorAJAX").innerHTML = "";
     }
 }
 
@@ -99,7 +99,9 @@ function init() {
 
     function foreachMano(item, index) {
         img = new Image();
-        img.src = "cartas/carta" + item + ".jpg"
+        img.src = "cartas/carta" + item + ".jpg";
+        img.title = "Cata " + item;
+        img.dataset.numeroCarta = item;
         nodoDivCartas.appendChild(img);
     }
     tuMano.forEach(foreachMano);
@@ -136,20 +138,22 @@ function ponerEstado() {
             mensaje2.innerHTML = "El cuentacuentos está pensando qué carta elegir";
         }
     } else {
+        console.log("Error, no existe el estado " + estadoJuego);
         divMensajes.classList.add("quitar");
     }
 
     nodoDivCartas.childNodes.forEach(
         function(currentValue, currentIndex, listObj) {
+            let numCarta = currentValue.dataset.numeroCarta;
             currentValue.classList.remove("elegible");
             if (eligeCarta) {
                 console.log("Dando evento a " + currentValue);
-                crearEvento(currentValue, "click", function() { elegirCarta(currentValue, currentIndex) });
+                crearEvento(currentValue, "click", function() { elegirCarta(numCarta, currentIndex) });
                 currentValue.classList.add("elegible");
             } else {
                 console.log("Quitando eventos a " + currentValue);
                 let imgClon = currentValue.cloneNode(true);
-
+                imgClon.dataset.numeroCarta = item;
                 currentValue.parentNode.replaceChild(imgClon, currentValue);
             }
         }

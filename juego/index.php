@@ -18,7 +18,21 @@ require($ruta.'/bbdd.php');
 
 if (isset($_GET['getEstadoPartida'])){
     //TODO: conexion bbdd
-    die("Inicio");
+    $bbdd = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
+    if (!$bbdd){
+        die('Error');
+    } else {
+        // Datos privados del Jugador en cuestión y la partida
+        $sql = 'SELECT Estado FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
+        $resultado = $bbdd->query($sql);
+    
+        while (($fila = mysqli_fetch_array($resultado))){
+            $estado = $fila[0];
+        }
+        $resultado->free();
+        $bbdd->close();
+    }
+    die($estado);
 }
 
 $foto = $ruta.'/perfiles/'.parsearNombreArchivo($_SESSION['usuario_correo']).'.foto';
@@ -114,7 +128,8 @@ foreach ($jugadores as $correo => $jugador) {
 
 var tuMano = new Array(<?php echo implode(',', $tu_mano);?>);
 
-var estadoJuego = "<?php echo $estado ?>";
+// var estadoJuego = "<?php echo $estado ?>";
+var estadoJuego = "";
 var cuentacuentos = "<?php echo $cuentacuentos ?>";
 var jugadorIndice = "<?php echo $jugador_indice ?>";
 
