@@ -74,7 +74,7 @@ body {
 #tusCartas > div > img {
   max-width: 10%;
   min-width: 100px;
-  border: 1px solid blue;
+  border: 1px solid gray;
   border-radius: 5%;
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -86,6 +86,9 @@ body {
 #tusCartas > div > img:active {
   transform: scale(2);
   transform-origin: 50% 100%;
+}
+#tusCartas > div > img.elegible {
+  border: 2px solid blue;
 }
 #tusCartas > h1 {
   text-align: center;

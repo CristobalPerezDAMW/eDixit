@@ -17,7 +17,8 @@ include($ruta.'/definiciones.php');
 require($ruta.'/bbdd.php');
 
 if (isset($_GET['getEstadoPartida'])){
-    die("Hostias");
+    //TODO: conexion bbdd
+    die("Inicio");
 }
 
 $foto = $ruta.'/perfiles/'.parsearNombreArchivo($_SESSION['usuario_correo']).'.foto';

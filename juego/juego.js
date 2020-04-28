@@ -49,21 +49,17 @@ function getAsync(url) {
 
 function estadoPeticion() {
     if (this.readyState == 4 && this.status == 200) {
-        var resultados = eval('(' + this.responseText + ')');
-        texto = "<table border=1><tr><th>Nombre Centro </th><th>Localidad</th> <th> Provincia </th><th>Telefono</th> <th> Fecha Visita </th><th>Numero Visitantes</th> </tr>";
-        for (var i = 0; i < resultados.length; i++) {
-            objeto = resultados[i];
-            texto += "<tr><td>" + objeto.nombrecentro + "</td><td>" +
-                objeto.localidad + "</td><td>" + objeto.provincia + "</td><td>" +
-                objeto.telefono + "</td><td>" + objeto.fechavisita + "</td><td>" +
-                objeto.numvisitantes + "</td></tr>";
-        }
-        document.getElementById("indicador").innerHTML = "";
-        document.getElementById("resultados").innerHTML = texto;
+        estadoJuego = this.responseText;
+        document.getElementById("indicadorAJAX").innerHTML = "";
+        ponerEstado();
     }
 }
 
-var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2;
+async function pedirEstadoJuego() {
+    getAsync(urlGetEstado + "?getEstadoPartida=true");
+};
+
+var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, nodoDivCartas;
 
 crearEvento(window, "load", init);
 
@@ -76,7 +72,7 @@ function init() {
     divMensajes = document.getElementById("mensajes");
     mensaje1 = document.getElementById("mensaje1");
     mensaje2 = document.getElementById("mensaje2");
-    var nodoDivCartas = document.createElement("div");
+    nodoDivCartas = document.createElement("div");
 
     jugadores.forEach(jugador => {
         let src = jugador.img;
@@ -93,25 +89,38 @@ function init() {
         }
 
         divJugadores.appendChild(jugador.img);
-        // console.log(jugador.img);
     });
 
-    /* Estados del juego:
-        "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
-        "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
-        "PensandoCartas:X": El cuentacuentos ha elegido carta y ahora la están eligiendo los demás jugadores. Quedan X jugadores por elegir carta
-        "Votacion:X": Los jugadores están votando qué carta creen que es del cuentacuentos. Quedan X jugadores por votar
-        "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
-    */
+
+    function foreachMano(item, index) {
+        img = new Image();
+        img.src = "cartas/carta" + item + ".jpg"
+        nodoDivCartas.appendChild(img);
+    }
+    tuMano.forEach(foreachMano);
+    divTusCartas.appendChild(nodoDivCartas);
+
+    pedirEstadoJuego();
+}
+
+/* Estados del juego:
+    "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
+    "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
+    "PensandoCartas:X": El cuentacuentos ha elegido carta y ahora la están eligiendo los demás jugadores. Quedan X jugadores por elegir carta
+    "Votacion:X": Los jugadores están votando qué carta creen que es del cuentacuentos. Quedan X jugadores por votar
+    "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
+*/
+function ponerEstado() {
+    console.log("PonerEstado con estado " + estadoJuego);
+    //Limpieza del estado anterior
+    divMensajes.classList.remove("quitar");
+
     var eligeCarta = false;
     if (estadoJuego == "Inicio") {
-        divMensajes.classList.remove("quitar");
-        // divMensajes.classList.add("quitar");
         mensaje1.innerHTML = "Fase Inicial";
         mensaje2.innerHTML = "El primero en poner carta es el primer cuentacuentos";
         eligeCarta = true;
     } else if (estadoJuego == "PensandoCC") {
-        divMensajes.classList.remove("quitar");
         if (cuentacuentos == jugadores[jugadorIndice].correo) {
             mensaje1.innerHTML = "Eres el Cuentacuentos";
             mensaje2.innerHTML = "Te toca elegir carta. Recuerda no pensar en una pista demasiado fácil.";
@@ -121,52 +130,27 @@ function init() {
             mensaje2.innerHTML = "El cuentacuentos está pensando qué carta elegir";
         }
     } else {
-        divMensajes.classList.remove("quitar");
         divMensajes.classList.add("quitar");
     }
 
-    function elegirCarta(carta, indice) {
-        // tuMano[indice].classList.add("quitar");
-        alert("hola, has seleccionado la carta num " + indice + ", que es la " + carta);
-    }
+    nodoDivCartas.childNodes.forEach(
+        function(currentValue, currentIndex, listObj) {
+            currentValue.classList.remove("elegible");
+            if (eligeCarta) {
+                console.log("Dando evento a " + currentValue);
+                crearEvento(currentValue, "click", function() { elegirCarta(currentValue, currentIndex) });
+                currentValue.classList.add("elegible");
+            } else {
+                console.log("Quitando eventos a " + currentValue);
+                let imgClon = currentValue.cloneNode(true);
 
-    function foreachMano(item, index) {
-        img = new Image();
-        img.src = "cartas/carta" + item + ".jpg"
-        img.title = "Carta " + item;
-        if (eligeCarta) {
-            crearEvento(img, "click", function() { elegirCarta(item, index) });
+                currentValue.parentNode.replaceChild(imgClon, currentValue);
+            }
         }
-        nodoDivCartas.appendChild(img);
-    }
-    tuMano.forEach(foreachMano);
-    divTusCartas.appendChild(nodoDivCartas);
+    );
 
-    //Hilo que comprueba si cambia el estado de la partida
-    // if (typeof(Worker) !== "undefined") {
-    //     // Se puede con Web Worker
-    //     var worker;
+}
 
-    //     function startWorker() {
-    //         if (typeof(worker) == "undefined") {
-    //             worker = new Worker("worker_estado_partida.js");
-    //         }
-    //         worker.postMessage(new Array(urlGetEstado));
-    //         worker.onmessage = function(event) {
-    //             alert(event.data);
-    //         };
-    //     }
-
-    //     function stopWorker() {
-    //         worker.terminate();
-    //         worker = undefined;
-    //     }
-
-    //     startWorker();
-    // } else {
-    //     // No se puede con Web Worker
-    // }
-    executeAsync(function() {
-        getAsync(urlGetEstado + "?getEstadoPartida=true");
-    });
+function elegirCarta(carta, indice) {
+    alert("hola, has seleccionado la carta num " + indice + ", que es la " + carta);
 }
