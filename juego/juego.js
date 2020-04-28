@@ -49,14 +49,19 @@ function getAsync(url) {
 
 function estadoPeticion() {
     if (this.readyState == 4 && this.status == 200) {
-        estadoJuego = this.responseText;
+        if (estadoJuego != this.responseText) {
+            estadoJuego = this.responseText;
+            ponerEstado();
+        }
         document.getElementById("indicadorAJAX").innerHTML = "";
-        ponerEstado();
     }
 }
 
 async function pedirEstadoJuego() {
     getAsync(urlGetEstado + "?getEstadoPartida=true");
+    setTimeout(() => {
+        pedirEstadoJuego();
+    }, 2000);
 };
 
 var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, nodoDivCartas;
@@ -110,6 +115,7 @@ function init() {
     "Votacion:X": Los jugadores están votando qué carta creen que es del cuentacuentos. Quedan X jugadores por votar
     "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
 */
+
 function ponerEstado() {
     console.log("PonerEstado con estado " + estadoJuego);
     //Limpieza del estado anterior
