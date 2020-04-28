@@ -18,11 +18,12 @@ $success: $green;
 $info: $cyan;
 $warning: $yellow;
 $danger: $red;
+$danger-text: $white;
 $disabled: $gray-400;
 $disabled-text: black;
 $light: $gray-100;
 $dark: $gray-800;
-$theme-colors: ("primary": $primary, "primary-text": $primary-text, "secondary": $secondary, "secondary-text": $secondary-text, "success": $success, "info": $info, "warning": $warning, "danger": $danger, "disabled": $disabled, "disabled-text": $disabled-text, "light": $light, "dark": $dark);
+$theme-colors: ("primary": $primary, "primary-text": $primary-text, "secondary": $secondary, "secondary-text": $secondary-text, "success": $success, "info": $info, "warning": $warning, "danger": $danger, "danger-text": $danger-text, "disabled": $disabled, "disabled-text": $disabled-text, "light": $light, "dark": $dark);
 $body-bg: $light;
 $body-color: $gray-900;
 // Elementos HTML
@@ -40,8 +41,10 @@ h1 {
 }
 
 .mensaje_importante {
-    font-size: $font-size-lg * 2;
+    font-size: $font-size-lg * 1.6;
     text-align: center;
+    padding-left: 10%;
+    padding-right: 10%;
 }
 
 .perfil {
