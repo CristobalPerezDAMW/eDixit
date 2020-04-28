@@ -58,7 +58,7 @@ function enPeticionLista() {
 }
 
 async function pedirEstadoJuego() {
-    getAsync(urlGetEstado + "?getEstadoPartida=true");
+    getAsync(urlGet + "?accion=get_estado_partida");
     setTimeout(() => {
         pedirEstadoJuego();
     }, 2000);
@@ -110,14 +110,6 @@ function init() {
     pedirEstadoJuego();
 }
 
-/* Estados del juego:
-    "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
-    "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
-    "PensandoCartas:X": El cuentacuentos ha elegido carta y ahora la están eligiendo los demás jugadores. Quedan X jugadores por elegir carta
-    "Votacion:X": Los jugadores están votando qué carta creen que es del cuentacuentos. Quedan X jugadores por votar
-    "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
-*/
-
 function ponerEstado() {
     console.log("PonerEstado con estado " + estadoJuego);
     //Limpieza del estado anterior
@@ -139,7 +131,10 @@ function ponerEstado() {
         }
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
-        divMensajes.classList.add("quitar");
+        // divMensajes.classList.add("quitar");
+        mensaje1.innerHTML = "Error";
+        mensaje2.innerHTML = "Lo sentimos mucho, algo no está del todo pulido por aquí detras.";
+        return;
     }
 
     nodoDivCartas.childNodes.forEach(
@@ -163,4 +158,21 @@ function ponerEstado() {
 
 function elegirCarta(carta, indice) {
     alert("hola, has seleccionado la carta num " + indice + ", que es la " + carta);
+
+    if (estadoJuego == "Inicio") {
+        getAsync(urlGet + "?accion=elegir_carta_inicio&carta_elegida=" + carta + "");
+        eligeCarta = true;
+    } else if (estadoJuego == "PensandoCC") {
+        if (cuentacuentos == jugadores[jugadorIndice].correo) {
+            mensaje1.innerHTML = "Eres el Cuentacuentos";
+            mensaje2.innerHTML = "Te toca elegir carta. Recuerda no pensar en una pista demasiado fácil.";
+            eligeCarta = true;
+        } else {
+            mensaje1.innerHTML = "Esperando al Cuentacuentos";
+            mensaje2.innerHTML = "El cuentacuentos está pensando qué carta elegir";
+        }
+    } else {
+        console.log("Error, no existe el estado " + estadoJuego);
+        divMensajes.classList.add("quitar");
+    }
 }
