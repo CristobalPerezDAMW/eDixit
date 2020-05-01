@@ -17,68 +17,79 @@ include($ruta.'/definiciones.php');
 require($ruta.'/bbdd.php');
 
 if (isset($_GET['accion'])){
+    $bbdd = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
+    if (!$bbdd){
+        die('Error');
+    } 
+    $sql = 'SELECT Id, Estado, Mano, Cuentacuentos FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
+    $resultado = $bbdd->query($sql);
+
+    if ($fila = mysqli_fetch_array($resultado)){
+        $id_partida = $fila[0];
+        $estado = $fila[1];
+        $mano_jugador = $fila[2];
+        $cuentacuentos = $fila[3];
+    }else {
+        die('Error: ¿La partida no existe?');
+    }
+    $resultado->free();
+
     switch($_GET['accion']){
         case 'get_estado_partida':
-            $bbdd = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
-            if (!$bbdd){
-                die('Error');
-            } else {
-                // Datos privados del Jugador en cuestión y la partida
-                $sql = 'SELECT Estado FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
-                $resultado = $bbdd->query($sql);
-            
-                while (($fila = mysqli_fetch_array($resultado))){
-                    $estado = $fila[0];
-                }
-                $resultado->free();
-                $bbdd->close();
-            }
-            die($estado);
+            $bbdd->close();
+            die($estado.';'.$mano_jugador.';'.$cuentacuentos);
             break;
 
         case 'elegir_carta_inicio':
-            $bbdd = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
-            if (!$bbdd){
+            if (!$estado=='Inicio'){
                 die('Error');
-            } else {
-                // Datos privados del Jugador en cuestión y la partida
-                $sql = 'UPDATE `partidas` SET `Cuentacuentos`=\''.$_SESSION['usuario_correo'].'\',`Estado`=\'PensandoCartas:0\';';
-                die($sql);
-                $bbdd->query($sql);
-
-                // Datos privados del Jugador en cuestión y la partida
-                $sql = 'SELECT Estado FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
-                $resultado = $bbdd->query($sql);
-            
-                while (($fila = mysqli_fetch_array($resultado))){
-                    $estado = $fila[0];
-                }
-                $resultado->free();
-                $bbdd->close();
             }
+            $sql = 'UPDATE `partidas` SET `Cuentacuentos`=\''.$_SESSION['usuario_correo'].'\',`Estado`=\'PensandoCartas\';';
+            $bbdd->query($sql);
+            
+            $sql = 'UPDATE `partida_jugador` SET `CartaElegida`=\''.$_GET['carta_elegida'].'\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\';';
+            // die($sql);
+            $bbdd->query($sql);
+            
+            // $sql = 'SELECT `Mano` FROM `partida_jugador` WHERE `Partida`=\''.$id_partida.'\' AND `Jugador`=\''.$_SESSION['usuario_correo'].'\';';
+            // $resultado = $bbdd->query($sql);
+            // if ($fila = mysqli_fetch_array($resultado)){
+            //     $mano = $fila[0];
+            // } else {
+            //     die('Error: No se pudo procesar la mano del jugador');
+            // }
+            $mano_jugador = explode(':', $mano_jugador);
+            for ($i=0; $i < count($mano_jugador); $i++) { 
+                if ($mano_jugador[$i]==$_GET['carta_elegida']){
+                    unset($mano_jugador[$i]);
+                    break;
+                }
+            }
+            $mano_jugador = implode(':', $mano_jugador);
+            
+            $sql = 'UPDATE `partida_jugador` SET `Mano`=\''.$mano_jugador.'\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\';';
+            // die($sql);
+            $bbdd->query($sql);
+            
+            $bbdd->close();
             die($estado);
             break;
     
         case 'elegir_carta_pensando_cartas':
-            $bbdd = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
-            if (!$bbdd){
-                die('Error');
-            } else {
-                // Datos privados del Jugador en cuestión y la partida
-                $sql = 'UPDATE `partidas` SET `Cuentacuentos`=\''.$_SESSION['usuario_correo'].'\',`Estado`=\'PensandoCartas:0\';';
-                die($sql);
-                $bbdd->query($sql);
+            // Datos privados del Jugador en cuestión y la partida
+            $sql = 'UPDATE `partidas` SET `Cuentacuentos`=\''.$_SESSION['usuario_correo'].'\',`Estado`=\'PensandoCartas:0\';';
+            die($sql);
+            $bbdd->query($sql);
 
-                // Datos privados del Jugador en cuestión y la partida
-                $sql = 'SELECT Estado FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
-                $resultado = $bbdd->query($sql);
-            
-                while (($fila = mysqli_fetch_array($resultado))){
-                    $estado = $fila[0];
-                }
-                $resultado->free();
-                $bbdd->close();
+            // Datos privados del Jugador en cuestión y la partida
+            $sql = 'SELECT Estado FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
+            $resultado = $bbdd->query($sql);
+        
+            while (($fila = mysqli_fetch_array($resultado))){
+                $estado = $fila[0];
             }
+            $resultado->free();
+            $bbdd->close();
             die($estado);
             break;
     }
