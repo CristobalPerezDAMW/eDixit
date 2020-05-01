@@ -1,5 +1,5 @@
-/*
-sass --watch scss:css
+/* sass --watch scss:css
+
 */
 body {
   height: 100vh;
@@ -105,19 +105,6 @@ body {
   max-height: 100%;
 }
 
-.error {
-  width: 100%;
-  padding: 10px;
-  color: white;
-  text-align: center;
-}
-
-#indicadorAJAX {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-}
-
 #mensajes {
   max-height: 10vh;
   display: flex;
@@ -142,6 +129,11 @@ body {
   font-weight: bolder;
 }
 
+#mensajeImagen {
+  display: none;
+  width: 30%;
+}
+
 @media only screen and (min-width: 400px) and (min-height: 400px), screen and (min-height: 400px) {
   #mensaje1 {
     font-size: 1.3rem;
@@ -151,6 +143,10 @@ body {
   #mensaje2 {
     font-size: 1rem;
     font-weight: bolder;
+  }
+
+  #mensajeImagen {
+    width: 40%;
   }
 }
 @media only screen and (min-width: 700px) and (min-height: 700px), screen and (min-height: 700px) {
@@ -162,6 +158,10 @@ body {
   #mensaje2 {
     font-size: 1.5rem;
     font-weight: bold;
+  }
+
+  #mensajeImagen {
+    width: 50%;
   }
 }
 @media only screen and (min-width: 900px) and (min-height: 900px), screen and (min-height: 900px) {
@@ -175,6 +175,19 @@ body {
     font-weight: bold;
   }
 }
+.error {
+  width: 100%;
+  padding: 10px;
+  color: white;
+  text-align: center;
+}
+
+#indicadorAJAX {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
 .quitar {
   display: none !important;
 }

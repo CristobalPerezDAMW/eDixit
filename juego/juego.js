@@ -38,36 +38,40 @@ function objetoXHR() {
     throw new Error("No se pudo crear el objeto XMLHttpRequest");
 }
 
-function getAsync(url) {
+function getAsync(url, saltarIndicador = false) {
     if (ajaxXHR) {
+        // if (!saltarIndicador) {
         document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
+        // }
         ajaxXHR.open('GET', url, true);
         ajaxXHR.onreadystatechange = enPeticionLista;
         ajaxXHR.send(null);
     }
 }
 
-function enPeticionLista() {
+function enPeticionLista(saltarIndicador = false) {
     if (this.readyState == 4 && this.status == 200) {
+        // if (!saltarIndicador) {
         document.getElementById("indicadorAJAX").innerHTML = "";
+        // }
         if (estadoJuego != this.responseText) {
             let datos = this.responseText.split(";");
             estadoJuego = datos[0];
             tuMano = datos[1].split(":");
             cuentacuentos = datos[2];
-            ponerEstado();
+            ponerEstado(eligeCarta);
         }
     }
 }
 
 async function pedirEstadoJuego() {
-    getAsync(urlGet + "?accion=get_estado_partida");
+    getAsync(urlGet + "?accion=get_estado_partida", true);
     setTimeout(() => {
         pedirEstadoJuego();
     }, 2000);
 };
 
-var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, divCartas;
+var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, divCartas, eligeCarta;
 
 crearEvento(window, "load", init);
 
@@ -104,12 +108,12 @@ function init() {
     pedirEstadoJuego();
 }
 
-function ponerEstado() {
-    console.log("PonerEstado con estado " + estadoJuego);
+function ponerEstado(eligeCartaAnterior) {
+    // console.log("PonerEstado con estado " + estadoJuego);
     //Limpieza del estado anterior
     divMensajes.classList.remove("quitar");
 
-    var eligeCarta = false;
+    eligeCarta = false;
     if (estadoJuego == "Inicio") {
         mensaje1.innerHTML = "Fase Inicial";
         mensaje2.innerHTML = "El primero en poner carta es el primer cuentacuentos";
@@ -152,17 +156,19 @@ function ponerEstado() {
                 }
             }
             if (!sinCarta) {
-                console.log("Carta " + numCarta + " sigue en la mano");
-                currentValue.classList.remove("elegible");
-                if (eligeCarta) {
-                    // console.log("Dando evento a " + currentValue);
-                    crearEvento(currentValue, "click", function() { elegirCarta(numCarta, currentIndex) });
-                    currentValue.classList.add("elegible");
-                } else {
-                    // console.log("Quitando eventos a " + currentValue);
-                    let imgClon = currentValue.cloneNode(true);
-                    imgClon.dataset.numeroCarta = numCarta;
-                    currentValue.parentNode.replaceChild(imgClon, currentValue);
+                // console.log("Carta " + numCarta + " sigue en la mano");
+                if (eligeCarta != eligeCartaAnterior) {
+                    currentValue.classList.remove("elegible");
+                    if (eligeCarta) {
+                        // console.log("Dando evento a " + currentValue);
+                        crearEvento(currentValue, "click", function() { elegirCarta(numCarta, currentIndex) });
+                        currentValue.classList.add("elegible");
+                    } else {
+                        // console.log("Quitando eventos a " + currentValue);
+                        let imgClon = currentValue.cloneNode(true);
+                        imgClon.dataset.numeroCarta = numCarta;
+                        currentValue.parentNode.replaceChild(imgClon, currentValue);
+                    }
                 }
             } else {
                 console.log("Carta " + numCarta + " YA NO sigue en la mano");
@@ -171,14 +177,20 @@ function ponerEstado() {
         }
     );
 
+    let i = 0;
     divJugadores.childNodes.forEach(
         function(currentValue, currentIndex, listObj) {
-            if (jugador[currentIndex] == cuentacuentos) {
-                currentValue.classList.add("cuentacuentos");
-                currentValue.title = jugador.nombre + " (" + jugador.correo + ") ¡Cuentacuentos!";
-            } else {
-                currentValue.classList.remove("cuentacuentos");
-                currentValue.title = jugador.nombre + " (" + jugador.correo + ")";
+            if (currentValue.nodeType == Node.ELEMENT_NODE) {
+                // console.log("Comprobando nodo " + currentValue + ", " + currentIndex);
+                // console.log(currentValue);
+                if (jugadores[i].correo == cuentacuentos) {
+                    currentValue.classList.add("cuentacuentos");
+                    currentValue.title = jugadores[i].nombre + " (" + jugadores[i].correo + ") ¡Cuentacuentos!";
+                } else {
+                    currentValue.classList.remove("cuentacuentos");
+                    currentValue.title = jugadores[i].nombre + " (" + jugadores[i].correo + ")";
+                }
+                i++;
             }
         }
     );

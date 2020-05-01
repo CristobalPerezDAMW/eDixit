@@ -1,5 +1,5 @@
-/*
-sass --watch scss:css
+/* sass --watch scss:css
+
 */
 
 @import "../scss/compartido";
@@ -116,20 +116,6 @@ body {
     }
 }
 
-.error {
-    width: 100%;
-    padding: 10px;
-    // background: red;
-    color: white;
-    text-align: center;
-}
-
-#indicadorAJAX {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-}
-
 #mensajes {
     max-height: 10vh;
     // background-color: blue;
@@ -157,6 +143,11 @@ body {
     font-weight: bolder;
 }
 
+#mensajeImagen {
+    display: none;
+    width: 30%;
+}
+
 @media only screen and (min-width: 400px) and (min-height: 400px),
 screen and (min-height: 400px) {
     #mensaje1 {
@@ -166,6 +157,9 @@ screen and (min-height: 400px) {
     #mensaje2 {
         font-size: 1rem;
         font-weight: bolder;
+    }
+    #mensajeImagen {
+        width: 40%;
     }
 }
 
@@ -179,6 +173,9 @@ screen and (min-height: 700px) {
         font-size: 1.5rem;
         font-weight: bold;
     }
+    #mensajeImagen {
+        width: 50%;
+    }
 }
 
 @media only screen and (min-width: 900px) and (min-height: 900px),
@@ -191,6 +188,20 @@ screen and (min-height: 900px) {
         font-size: 2rem;
         font-weight: bold;
     }
+}
+
+.error {
+    width: 100%;
+    padding: 10px;
+    // background: red;
+    color: white;
+    text-align: center;
+}
+
+#indicadorAJAX {
+    position: absolute;
+    left: 0px;
+    top: 0px;
 }
 
 // Utilidades

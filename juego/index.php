@@ -204,17 +204,15 @@ var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
 </div>
 
 <div id="jugadores">
-    <!-- <h1>Jugadores</h1> -->
 </div>
 <div id="tablero">
     <div id="mensajes">
         <p id="mensaje1"></p>
         <p id="mensaje2"></p>
     </div>
-    <!-- <img src="cartas/carta1.jpg" alt="xd"> -->
+    <img id="mensajeImagen"/>
 </div>
 <div id="tusCartas">
-    <!-- <h1>Tus Cartas:</h1> -->
 </div>
 </body>
 </html>
