@@ -55,7 +55,11 @@ body {
 }
 
 #jugadores img.cuentacuentos {
-  box-shadow: 0 0 0 10px #CCA, 0 0 0 15px #EEC;
+  box-shadow: 0 0 0 7px #CCA, 0 0 0 12px #EEC;
+}
+
+#jugadores img.eligiendo {
+  box-shadow: 0 0 0 10px #C0A, 0 0 0 15px #E0C;
 }
 
 #tusCartas {
@@ -64,7 +68,6 @@ body {
   flex-direction: column;
 }
 #tusCartas > div {
-  background-color: yellow;
   min-height: 20vh;
   max-width: 100%;
   display: flex;
@@ -72,13 +75,12 @@ body {
   flex-wrap: wrap;
 }
 #tusCartas > div > img {
-  max-width: 10%;
-  min-width: 100px;
-  border: 1px solid gray;
-  border-radius: 5%;
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
+  max-width: 10%;
+  min-width: 100px;
+  border: 1px solid gray;
   margin: 1%;
   transition: all 0.2s;
 }
@@ -94,7 +96,14 @@ body {
   text-align: center;
 }
 
+#tusCartas > div > img,
+#mensajeImagen {
+  border-radius: 5%;
+}
+
 #tablero {
+  margin-left: 5%;
+  margin-right: 5%;
   height: 100%;
   max-height: 100%;
   display: flex;
@@ -115,10 +124,15 @@ body {
 
 #mensaje1 {
   display: block;
+}
+
+#mensaje1,
+#mensajePista {
   font-size: 0.9rem;
   text-align: center;
   text-shadow: 0px 0px 3px #fff;
   font-weight: bolder;
+  max-width: 30em;
 }
 
 #mensaje2 {
@@ -130,12 +144,19 @@ body {
 }
 
 #mensajeImagen {
-  display: none;
-  width: 30%;
+  height: 100%;
+  max-height: 30vh;
+  max-width: 50vw;
+}
+
+#mensajePista {
+  font-family: fantasy;
+  padding: 5%;
 }
 
 @media only screen and (min-width: 400px) and (min-height: 400px), screen and (min-height: 400px) {
-  #mensaje1 {
+  #mensaje1,
+#mensajePista {
     font-size: 1.3rem;
     font-weight: bolder;
   }
@@ -144,13 +165,10 @@ body {
     font-size: 1rem;
     font-weight: bolder;
   }
-
-  #mensajeImagen {
-    width: 40%;
-  }
 }
 @media only screen and (min-width: 700px) and (min-height: 700px), screen and (min-height: 700px) {
-  #mensaje1 {
+  #mensaje1,
+#mensajePista {
     font-size: 2rem;
     font-weight: bold;
   }
@@ -159,13 +177,10 @@ body {
     font-size: 1.5rem;
     font-weight: bold;
   }
-
-  #mensajeImagen {
-    width: 50%;
-  }
 }
 @media only screen and (min-width: 900px) and (min-height: 900px), screen and (min-height: 900px) {
-  #mensaje1 {
+  #mensaje1,
+#mensajePista {
     font-size: 3rem;
     font-weight: bold;
   }

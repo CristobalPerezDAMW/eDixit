@@ -40,10 +40,10 @@ function objetoXHR() {
 
 function getAsync(url, saltarIndicador = false) {
     if (ajaxXHR) {
-        // if (!saltarIndicador) {
-        document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
-        // }
-        ajaxXHR.open('GET', url, true);
+        // document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
+        // console.log(url);
+        console.log(encodeURI(url));
+        ajaxXHR.open('GET', encodeURI(url), true);
         ajaxXHR.onreadystatechange = enPeticionLista;
         ajaxXHR.send(null);
     }
@@ -51,14 +51,32 @@ function getAsync(url, saltarIndicador = false) {
 
 function enPeticionLista(saltarIndicador = false) {
     if (this.readyState == 4 && this.status == 200) {
-        // if (!saltarIndicador) {
-        document.getElementById("indicadorAJAX").innerHTML = "";
-        // }
-        if (estadoJuego != this.responseText) {
+        // document.getElementByI("indicadorAJAX").innerHTML = "";
+        if (this.responseText.startsWith('Error') !== false) {
+            console.log(this.responseText);
+        } else {
+            console.log(this.responseText);
             let datos = this.responseText.split(";");
-            estadoJuego = datos[0];
-            tuMano = datos[1].split(":");
-            cuentacuentos = datos[2];
+            if (datos.length > 1) {
+                if (datos[1] != "null")
+                    tuMano = datos[1].split(":");
+                if (datos.length > 2) {
+                    if (datos[2] != "null")
+                        cuentacuentos = datos[2];
+                    if (datos.length > 3) {
+                        if (datos[3] != "null")
+                            pista = datos[3];
+                        if (datos.length > 4) {
+                            if (datos[4] != "null")
+                                cartaElegida = datos[4];
+                        }
+                    }
+                }
+            }
+            if (datos[0] != estadoJuego) {
+                console.log("El estado " + estadoJuego + " es diferente a la respuesta " + this.responseText);
+                estadoJuego = datos[0];
+            }
             ponerEstado(eligeCarta);
         }
     }
@@ -71,7 +89,7 @@ async function pedirEstadoJuego() {
     }, 2000);
 };
 
-var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, divCartas, eligeCarta;
+var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, mensajeImagen, mensajePista, divCartas, eligeCarta, yaElegida, pista = "";
 
 crearEvento(window, "load", init);
 
@@ -84,6 +102,8 @@ function init() {
     divMensajes = document.getElementById("mensajes");
     mensaje1 = document.getElementById("mensaje1");
     mensaje2 = document.getElementById("mensaje2");
+    mensajeImagen = document.getElementById("mensajeImagen");
+    mensajePista = document.getElementById("mensajePista");
     divCartas = document.createElement("div");
 
     jugadores.forEach(jugador => {
@@ -109,9 +129,10 @@ function init() {
 }
 
 function ponerEstado(eligeCartaAnterior) {
-    // console.log("PonerEstado con estado " + estadoJuego);
     //Limpieza del estado anterior
     divMensajes.classList.remove("quitar");
+    mensajeImagen.classList.add("quitar");
+    mensajePista.classList.add("quitar");
 
     eligeCarta = false;
     if (estadoJuego == "Inicio") {
@@ -132,9 +153,12 @@ function ponerEstado(eligeCartaAnterior) {
             mensaje1.innerHTML = "Has elegido carta";
             mensaje2.innerHTML = "Debes esperar mientras los demás eligen su carta para esta ronda.";
         } else {
+            mensajeImagen.src = "cartas/cartaReverso.jpg";
+            mensajePista.innerHTML = "Pista:<br>" + pista;
+            divMensajes.classList.add("quitar");
+            mensajeImagen.classList.remove("quitar");
+            mensajePista.classList.remove("quitar");
             eligeCarta = true;
-            mensaje1.innerHTML = "El cuentacuentos ha elegido carta";
-            mensaje2.innerHTML = "Elige algo que se asemeje a la psita (sí, no conoces la pista, lo sé, espera que estoy todavía haciendo el juego no tengas prisa)";
         }
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
@@ -143,6 +167,9 @@ function ponerEstado(eligeCartaAnterior) {
         // mensaje2.innerHTML = "Lo sentimos mucho, algo no está del todo pulido por aquí detras.";
         mensaje2.innerHTML = "¿Qué esperabas? El juego no está terminado, pero gracias por intentarlo.";
         return;
+    }
+    if (yaElegida) {
+        eligeCarta = false;
     }
 
     divCartas.childNodes.forEach(
@@ -160,11 +187,11 @@ function ponerEstado(eligeCartaAnterior) {
                 if (eligeCarta != eligeCartaAnterior) {
                     currentValue.classList.remove("elegible");
                     if (eligeCarta) {
-                        // console.log("Dando evento a " + currentValue);
+                        console.log("Dando evento a " + currentValue);
                         crearEvento(currentValue, "click", function() { elegirCarta(numCarta, currentIndex) });
                         currentValue.classList.add("elegible");
                     } else {
-                        // console.log("Quitando eventos a " + currentValue);
+                        console.log("Quitando eventos a " + currentValue);
                         let imgClon = currentValue.cloneNode(true);
                         imgClon.dataset.numeroCarta = numCarta;
                         currentValue.parentNode.replaceChild(imgClon, currentValue);
@@ -185,9 +212,11 @@ function ponerEstado(eligeCartaAnterior) {
                 // console.log(currentValue);
                 if (jugadores[i].correo == cuentacuentos) {
                     currentValue.classList.add("cuentacuentos");
+                    currentValue.classList.add("eligiendo");
                     currentValue.title = jugadores[i].nombre + " (" + jugadores[i].correo + ") ¡Cuentacuentos!";
                 } else {
                     currentValue.classList.remove("cuentacuentos");
+                    currentValue.classList.add("eligiendo");
                     currentValue.title = jugadores[i].nombre + " (" + jugadores[i].correo + ")";
                 }
                 i++;
@@ -198,24 +227,21 @@ function ponerEstado(eligeCartaAnterior) {
 
 function elegirCarta(carta, indice) {
     // alert("hola, has seleccionado la carta num " + indice + ", que es la " + carta);
-
+    let pista = "";
     if (estadoJuego == "Inicio") {
-        getAsync(urlGet + "?accion=elegir_carta_inicio&carta_elegida=" + carta + "");
-    } else if (estadoJuego == "PensandoCC") {
-        if (cuentacuentos == jugadores[jugadorIndice].correo) {
-            mensaje1.innerHTML = "Eres el Cuentacuentos";
-            mensaje2.innerHTML = "Te toca elegir carta. Recuerda no pensar en una pista demasiado fácil.";
-        } else {
-            mensaje1.innerHTML = "Esperando al Cuentacuentos";
-            mensaje2.innerHTML = "El cuentacuentos está pensando qué carta elegir";
+        while (pista == "")
+            pista = prompt("Ofrece una pista para los demás jugadores");
+        if (pista == "null") {
+            return;
         }
-    } else if (estadoJuego.startsWith("Error")) {
-        console.log(estadoJuego);
-        // divMensajes.classList.add("quitar");
-        mensaje1.innerHTML = "¡¡¡!!!";
-        mensaje2.innerHTML = estadoJuego;
+        getAsync(urlGet + "?accion=elegir_carta_inicio&carta_elegida=" + carta + "" + "&pista=" + pista);
+    } else if (estadoJuego == "PensandoCartas") {
+        getAsync(urlGet + "?accion=elegir_carta_pensando_cartas&carta_elegida=" + carta);
     } else {
-        console.log("Error, no existe el estado " + estadoJuego);
-        divMensajes.classList.add("quitar");
+        console.log("Error, no se admite durante el estado " + estadoJuego);
+        alert("No puedes elegir cartas ahora");
+        return;
     }
+    yaElegida = true;
+    ponerEstado(true);
 }
