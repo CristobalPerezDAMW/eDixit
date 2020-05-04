@@ -42,7 +42,7 @@ function getAsync(url, saltarIndicador = false) {
     if (ajaxXHR) {
         // document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
         // console.log(url);
-        console.log(encodeURI(url));
+        // console.log(encodeURI(url));
         ajaxXHR.open('GET', encodeURI(url), true);
         ajaxXHR.onreadystatechange = enPeticionLista;
         ajaxXHR.send(null);
@@ -55,7 +55,7 @@ function enPeticionLista(saltarIndicador = false) {
         if (this.responseText.startsWith('Error') !== false) {
             console.log(this.responseText);
         } else {
-            console.log(this.responseText);
+            // console.log(this.responseText);
             let datos = this.responseText.split(";");
             if (datos.length > 1) {
                 if (datos[1] != "null")
@@ -74,7 +74,6 @@ function enPeticionLista(saltarIndicador = false) {
                 }
             }
             if (datos[0] != estadoJuego) {
-                console.log("El estado " + estadoJuego + " es diferente a la respuesta " + this.responseText);
                 estadoJuego = datos[0];
             }
             ponerEstado(eligeCarta);
@@ -187,11 +186,11 @@ function ponerEstado(eligeCartaAnterior) {
                 if (eligeCarta != eligeCartaAnterior) {
                     currentValue.classList.remove("elegible");
                     if (eligeCarta) {
-                        console.log("Dando evento a " + currentValue);
+                        // console.log("Dando evento a " + currentValue);
                         crearEvento(currentValue, "click", function() { elegirCarta(numCarta, currentIndex) });
                         currentValue.classList.add("elegible");
                     } else {
-                        console.log("Quitando eventos a " + currentValue);
+                        // console.log("Quitando eventos a " + currentValue);
                         let imgClon = currentValue.cloneNode(true);
                         imgClon.dataset.numeroCarta = numCarta;
                         currentValue.parentNode.replaceChild(imgClon, currentValue);

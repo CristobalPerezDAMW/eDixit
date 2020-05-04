@@ -80,7 +80,6 @@ body {
   -moz-box-sizing: border-box;
   max-width: 10%;
   min-width: 100px;
-  border: 1px solid gray;
   margin: 1%;
   transition: all 0.2s;
 }
@@ -98,6 +97,7 @@ body {
 
 #tusCartas > div > img,
 #mensajeImagen {
+  border: 1px solid gray;
   border-radius: 5%;
 }
 

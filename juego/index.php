@@ -172,7 +172,7 @@ if (!$bbdd){
 ?>
 
 <script>
-// Para escribir desde php
+// Para escribir en javascript desde php
 var jugadores = new Array(
 <?php
 foreach ($jugadores as $correo => $jugador) {
@@ -197,7 +197,7 @@ var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
 </script>
 
 <script src="juego.js" type="text/javascript"></script>
-<noscript>Su navegador no puede ejecutar este juego, disculpe las molestias.</noscript>
+<noscript>Su navegador no puede ejecutar este juego, disculpe las molestias. <a href="..">Pulse aquí para volver</a></noscript>
 <div id="indicadorAJAX">
     <!-- <img src='imgs/ajax-loading.gif'/> -->
 </div>
