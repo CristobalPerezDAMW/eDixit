@@ -44,11 +44,12 @@ body {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    margin: 3px;
     border-radius: 50%;
     border: 1px solid black;
+    // margin: 3px;
     margin-left: 5px;
     margin-bottom: 5px;
+    padding: 2px;
     overflow-x: auto;
 }
 
@@ -61,11 +62,12 @@ body {
     // outline: 1px solid blue;
     // background-clip: border-box;
     // background-color: yellow;
-    box-shadow: 0 0 0 7px #CCA, 0 0 0 12px #EEC;
+    box-shadow: 0 0 0 10px #C0A, 0 0 0 15px #E0C;
 }
 
 #jugadores img.eligiendo {
-    box-shadow: 0 0 0 10px #C0A, 0 0 0 15px #E0C;
+    // box-shadow: 0 0 0 7px #CCA, 0 0 0 12px #EEC;
+    background-color: yellow;
 }
 
 #tusCartas {
