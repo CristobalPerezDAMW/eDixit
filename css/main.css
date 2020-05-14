@@ -1,6 +1,6 @@
 @charset "UTF-8";
-/*
-sass --watch scss:css
+/* sass --watch scss:css
+
 */
 h1 {
   text-align: center;
@@ -51,6 +51,93 @@ h1 {
   font-size: 1.25rem;
 }
 
+.comojugar .row > * {
+  width: 100%;
+}
+
+.comojugar .row > div {
+  margin-top: 5px;
+}
+
+.comojugar picture {
+  width: 100%;
+  display: block;
+  text-align: center;
+}
+
+.comojugar img {
+  max-width: 100%;
+}
+
+.comojugar p,
+.comojugar li {
+  margin: auto;
+  text-align: start;
+  font-size: 1.1rem;
+  max-width: 18em;
+}
+
+.comojugar h1 {
+  text-align: center;
+  font-size: 1.9rem;
+  margin-top: 20px;
+}
+
+.comojugar h2 {
+  text-align: center;
+  font-size: 1.6rem;
+  margin-top: 16px;
+}
+
+.comojugar h3 {
+  text-align: center;
+  font-size: 1.3rem;
+  margin-top: 12px;
+}
+
+@media screen and (min-width: 900px) {
+  .comojugar p,
+.comojugar li {
+    font-size: 1.3rem;
+  }
+
+  .comojugar h1 {
+    text-align: center;
+    font-size: 2.1rem;
+  }
+
+  .comojugar h2 {
+    text-align: center;
+    font-size: 1.8rem;
+  }
+
+  .comojugar h3 {
+    text-align: center;
+    font-size: 1.5rem;
+  }
+}
+@media screen and (min-width: 1400px) {
+  .comojugar p,
+.comojugar li {
+    font-size: 1.5rem;
+    max-width: 35em;
+  }
+
+  .comojugar h1 {
+    text-align: center;
+    font-size: 2.3rem;
+  }
+
+  .comojugar h2 {
+    text-align: center;
+    font-size: 2rem;
+  }
+
+  .comojugar h3 {
+    text-align: center;
+    font-size: 1.7rem;
+  }
+}
 /*!
  * Bootstrap v4.3.1 (https://getbootstrap.com/)
  * Copyright 2011-2019 The Bootstrap Authors
