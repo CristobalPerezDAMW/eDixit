@@ -5,7 +5,7 @@ require("../cabecera.php");
 ?>
 <div class="container comojugar">
     <div class="row">
-        <h1>El turno</h1>
+        <h1>El juego</h1>
         <picture>
             <source srcset="imgs/fisico-900.webp" media="(min-width: 600px)" type="image/webp">
             <source srcset="imgs/fisico-600.webp" type="image/webp">
@@ -82,6 +82,27 @@ require("../cabecera.php");
     <div class="row">
         <h3>Identificar y engañar</h3>
         <p>En cada ronda lo ideal, si no eres el Cuentacuentos, es engañar a tus oponentes para que piensen que la carta que fue la colocada por el Cuentacuentos es la tuya, elegiendo una de tu mano que sea apropiada con la pista dada, y al mismo tiempo identificar correctamente la verdadera carta del Cuentacuentos. De esta forma puntuarás muchos más puntos y negarás puntos a tus adversarios.</p>
+    </div>
+</div>
+<div class="container comojugar">
+    <div class="row">
+        <h1>eDixit</h1>
+    </div>
+    <div class="row">
+        <h3>Crear partida pública</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Veniam laboriosam, totam consectetur dicta omnis sint earum hic. Deserunt rem porro provident esse enim error, culpa, fuga animi corporis possimus eius!</p>
+    </div>
+    <div class="row">
+        <h3>Crear partida privada</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Veniam laboriosam, totam consectetur dicta omnis sint earum hic. Deserunt rem porro provident esse enim error, culpa, fuga animi corporis possimus eius!</p>
+    </div>
+    <div class="row">
+        <h3>Unirse a una partida pública</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Veniam laboriosam, totam consectetur dicta omnis sint earum hic. Deserunt rem porro provident esse enim error, culpa, fuga animi corporis possimus eius!</p>
+    </div>
+    <div class="row">
+        <h3>Unirse a una partida privada</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Veniam laboriosam, totam consectetur dicta omnis sint earum hic. Deserunt rem porro provident esse enim error, culpa, fuga animi corporis possimus eius!</p>
     </div>
 </div>
 </body>
