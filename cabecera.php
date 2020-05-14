@@ -9,7 +9,6 @@ if (!isset($pag)){
     $pag = 'Inicio';
 }
 // die($ruta);
-$actual = $_SERVER['PHP_SELF'];
 include($ruta.'/definiciones.php');
 
 $foto = $ruta.'/imgs/sin_foto.png';
@@ -73,7 +72,7 @@ if (isset($_SESSION['iniciada'])){
             <div class="collapse navbar-collapse" id="collapsibleNavId">
                 <ul class="navbar-nav ml-auto mt-2 mt-md-0">
                     <?php
-                    $esInicio = $actual=='/eDixit/index.php';
+                    $esInicio = $pag=='Inicio';
                     echo '
                     <li class="nav-item '.($esInicio?'disabled':'active').'">
                         <a class="nav-link '.($esInicio?'disabled':'').'" href="'.$ruta.'">Inicio</a>
@@ -87,11 +86,15 @@ if (isset($_SESSION['iniciada'])){
                     ?>
                         <div class="dropdown-menu" aria-labelledby="dropdown1">
                             <?php
+                        // echo '
+                        // <a class="dropdown-item" href="'.$ruta.'/archivos/dixit-reglas.pdf" target="_blank">Manual del
+                        //     Juego <i class="fa fa-external-link" aria-hidden="true"></i></a>
+                        // <a class="dropdown-item" href="https://www.eljuegodemesa.com/como-se-juega-a-dixit/"
+                        //     target="_blank">Tutorial <i class="fa fa-external-link" aria-hidden="true"></i></a>
+                        // ';
                         echo '
-                        <a class="dropdown-item" href="'.$ruta.'/archivos/dixit-reglas.pdf" target="_blank">Manual del
-                            Juego <i class="fa fa-external-link" aria-hidden="true"></i></a>
-                        <a class="dropdown-item" href="https://www.eljuegodemesa.com/como-se-juega-a-dixit/"
-                            target="_blank">Tutorial <i class="fa fa-external-link" aria-hidden="true"></i></a>
+                        <a class="dropdown-item '.($pag=='Cómo Jugar'?'disabled':'').'" href="'.$ruta.'/comojugar">Tutorial del juego</i></a>
+                        <a class="dropdown-item" href="'.$ruta.'/archivos/dixit-reglas.pdf" target="_blank">Manual del Juego <i class="fa fa-external-link" aria-hidden="true"></i></a>
                         ';
                         ?>
                         </div>
@@ -102,21 +105,21 @@ if (isset($_SESSION['iniciada'])){
                         <a class="nav-link dropdown-toggle" href="'.$ruta.'/#" id="dropdown2" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">Contacto</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item '.($actual=='/eDixit/nosotros/index.php'?'disabled':'').'" href="'.$ruta.'/nosotros/">Nosotros</a>
+                            <a class="dropdown-item '.($pag=='Nosotros'?'disabled':'').'" href="'.$ruta.'/nosotros/">Nosotros</a>
                         </div>
                         ';
                     ?>
                     </li>
                     <?php 
-                        $esLogin = $actual=='/eDixit/login/index.php';
+                        $esLogin = $pag=='Iniciar Sesión';
                         echo '<li class="nav-item dropdown '.($esLogin?'disabled':'active').'">';
                         if (isset($_SESSION['iniciada'])){
                             echo '<a class="nav-link dropdown-toggle" href="./#" id="dropdown3" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false"><img class="perfil-mini mr-1" src="'.$foto.'?='.filemtime($foto).'" alt="Tu foto de perfil"/>'.$_SESSION['usuario_nombre'].'</a>';
                             echo '
                             <div class="dropdown-menu">
-                                <a class="dropdown-item '.($actual=='/eDixit/usuario/index.php'?'disabled':'').'" href="'.$ruta.'/usuario">Mi perfil</a>
-                                <a class="dropdown-item '.($actual=='/eDixit/usuario/editar/index.php'?'disabled':'').'" href="'.$ruta.'/usuario/editar">Editar Perfil</a>
+                                <a class="dropdown-item '.($pag=='Mi Perfil'?'disabled':'').'" href="'.$ruta.'/usuario">Mi perfil</a>
+                                <a class="dropdown-item '.($pag=='Editar Perfil'?'disabled':'').'" href="'.$ruta.'/usuario/editar">Editar Perfil</a>
                                 <a class="dropdown-item" href="'.$ruta.'/login/cerrar.php">Cerrar Sesión</a>
                             </div>
                             ';
@@ -126,12 +129,6 @@ if (isset($_SESSION['iniciada'])){
                         echo '</li>';
                     ?>
                 </ul>
-                <!-- Jejeje esperemos usarlo
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Buscar">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Buscar</button>
-                </form>
-                -->
             </div>
         </nav>
     </div>
