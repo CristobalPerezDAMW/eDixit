@@ -1,3 +1,0 @@
-bbdd: db_dixit
-usuario: usuario_dixit@localhost
-contra: jy8-YBk*WV..DVM

@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.0.1
+-- version 4.6.6deb5
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 24-04-2020 a las 09:59:38
--- Versión del servidor: 10.1.32-MariaDB
--- Versión de PHP: 7.2.5
+-- Servidor: localhost:3306
+-- Tiempo de generación: 15-05-2020 a las 08:25:54
+-- Versión del servidor: 10.1.44-MariaDB-0ubuntu0.18.04.1
+-- Versión de PHP: 7.2.24-0ubuntu0.18.04.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -31,16 +29,18 @@ SET time_zone = "+00:00";
 CREATE TABLE `partidas` (
   `Id` int(11) NOT NULL,
   `Cuentacuentos` varchar(200) DEFAULT NULL,
+  `Pista` text,
   `CartasPila` text NOT NULL,
-  `Estado` text
+  `Estado` varchar(20) NOT NULL DEFAULT 'Inicio',
+  `UltActivo` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `partidas`
 --
 
-INSERT INTO `partidas` (`Id`, `Cuentacuentos`, `CartasPila`, `Estado`) VALUES
-(115, 'cristichi@hotmail.es', '19:20:21:22:23:24:25:26:27', 'Inicio');
+INSERT INTO `partidas` (`Id`, `Cuentacuentos`, `Pista`, `CartasPila`, `Estado`, `UltActivo`) VALUES
+(115, 'admin@admin.ga', 'día del libro', '19:20:21:22:23:24:25:26:27', 'Votacion', '2020-05-15 08:20:39');
 
 -- --------------------------------------------------------
 
@@ -52,17 +52,18 @@ CREATE TABLE `partida_jugador` (
   `Partida` int(11) NOT NULL,
   `Jugador` varchar(200) NOT NULL,
   `Posicion` int(11) NOT NULL,
-  `Mano` tinytext
+  `Mano` tinytext,
+  `CartaElegida` tinyint(3) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `partida_jugador`
 --
 
-INSERT INTO `partida_jugador` (`Partida`, `Jugador`, `Posicion`, `Mano`) VALUES
-(115, 'admin@admin.ga', 0, '1:2:3:4:5:6'),
-(115, 'cristichi@hotmail.es', 0, '7:8:9:10:11:12'),
-(115, 'cristichikillerpsn@gmail.com', 0, '13:14:15:16:17:18');
+INSERT INTO `partida_jugador` (`Partida`, `Jugador`, `Posicion`, `Mano`, `CartaElegida`) VALUES
+(115, 'admin@admin.ga', 0, '1:3:4:5:6', 2),
+(115, 'cristichi@hotmail.es', 0, '7:8:9:10:12', 11),
+(115, 'usuario', 0, '13:14:15:16:17', 18);
 
 -- --------------------------------------------------------
 
@@ -83,6 +84,7 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`Correo`, `Nombre`, `Contra`, `Admin`, `Verificacion`) VALUES
+('admin', 'Administrador', '21232f297a57a5a743894a0e4a801fc3', 1, NULL),
 ('admin@admin.ga', 'Administrador', '21232f297a57a5a743894a0e4a801fc3', 1, NULL),
 ('cristichi@hotmail.es', 'Cristichi', '6e7bc035c10d6d628e9067ae9b034d41', 0, NULL),
 ('cristichikillerpsn@gmail.com', 'Cristichi', '6e7bc035c10d6d628e9067ae9b034d41', 0, NULL),
@@ -90,6 +92,7 @@ INSERT INTO `usuarios` (`Correo`, `Nombre`, `Contra`, `Admin`, `Verificacion`) V
 ('fdgongora@iesmurgi.org', 'Pepe', '6588291fabc526ef29eef7f5e73a66f6', 0, NULL),
 ('focusyi@hotmail.com', 'Danikileitor', '25f9e794323b453885f5181f1b624d0b', 0, NULL),
 ('ramperrub@gmail.com', 'Ramon', '52e95dde8c35e734e92e3cedbfe75b27', 0, 'ABg0Tg5pZg3OuTbFPgprq7EeNAIskO'),
+('usuario', 'usuario', 'f8032d5cae3de20fcec887f395ec9a6a', 0, NULL),
 ('very_18_8@hotmail.es', 'Verónica ', '36208229a1f277c3c27b69db861be759', 0, NULL);
 
 --
@@ -126,7 +129,6 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `partidas`
   MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
-
 --
 -- Restricciones para tablas volcadas
 --
@@ -143,7 +145,6 @@ ALTER TABLE `partidas`
 ALTER TABLE `partida_jugador`
   ADD CONSTRAINT `partida_jugador_ibfk_1` FOREIGN KEY (`Partida`) REFERENCES `partidas` (`Id`),
   ADD CONSTRAINT `partida_jugador_ibfk_2` FOREIGN KEY (`Jugador`) REFERENCES `usuarios` (`Correo`);
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

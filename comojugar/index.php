@@ -65,7 +65,6 @@ require("../cabecera.php");
     <div class="row">
         <h3>Fin del Juego</h3>
         <p>El primer jugador en llegar a los 30 puntos gana. En caso de que más de un jugador alcance los 30 puntos en el mismo turno, quedan empatados.</p>
-        <p>Sin embargo, en lugar de jugar hasta 30 puntos se puede jugar hasta que se agoten las cartas, en cuyo caso el ganador es el jugador con más puntos cuando esto ocurre, de nuevo con posibilidad de empate.</p>
         
         <picture>
             <source srcset="imgs/cartas-900.webp" media="(min-width: 600px)" type="image/webp">
