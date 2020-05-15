@@ -102,9 +102,9 @@ if (isset($_GET['accion'])){
             // die($sql);
             $bbdd->query($sql);
 
-            // Tiene que ser 1 porque es el número antes de añadir el voto actual, y sabemos a ciencia cierta que antes no estaba registrado y ahora sí
+            // Tiene que ser 1 porque es el número antes de añadir el voto actual, y sabemos a ciencia cierta que antes no estaba registrado y ahora sí, de modo que si sólo hay 1 en $faltan es que ya no queda nadie
             if (count($faltan) == 1){
-                $sql = 'UPDATE `partidas` SET `Estado`=\'Votacion\' WHERE `Id`=\''.$id_partida.'\'';
+                $sql = 'UPDATE `partidas` SET `Estado`=\'Votacion\', `UltActivo`=CURRENT_TIME() WHERE `Id`=\''.$id_partida.'\'';
                 $bbdd->query($sql);
                 $bbdd->close();
                 die('Votacion');
@@ -230,6 +230,20 @@ var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
     <div id="mensajes">
         <p id="mensaje1"></p>
         <p id="mensaje2"></p>
+        <div id="cartas_votacion">
+            <div>
+                <img src="cartas/carta1.jpg" alt="Cartita">
+                <p>1</p>
+            </div>
+            <div>
+                <img src="cartas/carta20.jpg" alt="Cartita">
+                <p>2</p>
+            </div>
+            <div>
+                <img src="cartas/carta13.jpg" alt="Cartita">
+                <p>3</p>
+            </div>
+        </div>
     </div>
     <img id="mensajeImagen"/>
     <p id="mensajePista"></p>

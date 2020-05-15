@@ -98,7 +98,8 @@ async function pedirEstadoJuego() {
     }, 2000);
 };
 
-var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, mensajeImagen, mensajePista, divCartas, eligeCarta, cartaElegida = 0,
+var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, mensajeImagen, mensajePista, divVotacion, divCartas, eligeCarta, cartaElegida = 0,
+    cartaVotada = 0,
     pista = "",
     listaFaltan = new Array();
 
@@ -115,6 +116,7 @@ function init() {
     mensaje2 = document.getElementById("mensaje2");
     mensajeImagen = document.getElementById("mensajeImagen");
     mensajePista = document.getElementById("mensajePista");
+    divVotacion = document.getElementById("cartas_votacion");
     divCartas = document.createElement("div");
 
     jugadores.forEach(jugador => {
@@ -136,14 +138,21 @@ function init() {
     tuMano.forEach(foreachMano);
     divTusCartas.appendChild(divCartas);
 
+    crearEvento(divVotacion, "click", function() {
+        alert("Has hecho click");
+    });
+
     pedirEstadoJuego();
 }
 
 function ponerEstado(eligeCartaAnterior) {
     //Limpieza del estado anterior
+    divCartas.classList.remove("quitar");
     divMensajes.classList.remove("quitar");
+    mensaje2.classList.remove("quitar");
     mensajeImagen.classList.add("quitar");
     mensajePista.classList.add("quitar");
+    divVotacion.classList.add("quitar");
 
     eligeCarta = false;
     if (estadoJuego == "Inicio") {
@@ -175,20 +184,19 @@ function ponerEstado(eligeCartaAnterior) {
             mensajePista.classList.remove("quitar");
             mensaje1.innerHTML = "Has elegido carta";
             mensaje2.innerHTML = "Debes esperar mientras los demás eligen su carta para esta ronda.";
-            eligeCarta = false;
         }
     } else if (estadoJuego == "Votacion") {
         if (cuentacuentos == jugadores[jugadorIndice].correo) {
             mensaje1.innerHTML = "Esperando";
             mensaje2.innerHTML = "Debes esperar mientras los demás votan una carta.";
-        } else if (cartaElegida == 0) {
-            mensaje1.innerHTML = "Estado Votación";
-            mensaje2.innerHTML = "Deberías ver el panel de votación pero requiere más trabajo.";
-            eligeCarta = true;
+        } else if (cartaVotada == 0) {
+            divCartas.classList.add("quitar");
+            divVotacion.classList.remove("quitar");
+            mensaje2.classList.add("quitar");
+            mensaje1.innerHTML = "Toca votar carta:";
         } else {
             mensaje1.innerHTML = "Has elegido carta";
             mensaje2.innerHTML = "Debes esperar mientras los demás votan una carta.";
-            eligeCarta = false;
         }
     } else {
         console.log("Error, no existe el estado " + estadoJuego);

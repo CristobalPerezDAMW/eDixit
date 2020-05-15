@@ -154,6 +154,40 @@ body {
   padding: 5%;
 }
 
+#cartas_votacion {
+  width: 90vw;
+  height: 100%;
+  display: flex;
+  justify-content: space-evenly;
+}
+#cartas_votacion > div {
+  position: relative;
+}
+#cartas_votacion > div > img {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  width: 100%;
+  border: 3px solid blue;
+}
+#cartas_votacion > div > p {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  background: #fff;
+  border: 2px solid blue;
+  color: #333;
+  text-align: center;
+  font: 32px fantasy;
+}
+#cartas_votacion > div:hover {
+  cursor: pointer;
+}
+
 @media only screen and (min-width: 400px) and (min-height: 400px), screen and (min-height: 400px) {
   #mensaje1,
 #mensajePista {
