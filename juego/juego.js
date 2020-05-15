@@ -182,17 +182,12 @@ function ponerEstado(eligeCartaAnterior) {
             mensaje1.innerHTML = "Esperando";
             mensaje2.innerHTML = "Debes esperar mientras los demás votan una carta.";
         } else if (cartaElegida == 0) {
-            // mensajeImagen.src = "cartas/cartaReverso.jpg";
-            // mensajePista.innerHTML = "Pista:<br>" + pista;
-            divMensajes.classList.add("quitar");
-            // mensajeImagen.classList.remove("quitar");
-            // mensajePista.classList.remove("quitar");
+            mensaje1.innerHTML = "Estado Votación";
+            mensaje2.innerHTML = "Deberías ver el panel de votación pero requiere más trabajo.";
             eligeCarta = true;
         } else {
-            mensajeImagen.classList.remove("quitar");
-            mensajePista.classList.remove("quitar");
             mensaje1.innerHTML = "Has elegido carta";
-            mensaje2.innerHTML = "Debes esperar mientras los demás eligen su carta para esta ronda.";
+            mensaje2.innerHTML = "Debes esperar mientras los demás votan una carta.";
             eligeCarta = false;
         }
     } else {
