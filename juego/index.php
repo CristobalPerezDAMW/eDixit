@@ -1,13 +1,14 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 'on');
+// error_reporting(E_ALL);
+// ini_set('display_errors', 'on');
 // Destáquese que todos los comentarios desaparecerán en las versiones de producción
 /* Estados del juego:
     "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
     "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
     "PensandoCartas": El cuentacuentos ha elegido carta y ahora la están eligiendo los demás jugadores.
     "Votacion": Los jugadores están votando qué carta creen que es del cuentacuentos.
-    "Puntos": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van
+    "Puntuacion": Se están repartiendo los puntos. Se toma un tiempo en este paso para que todos los jugadores vean cómo van.
+    "Final": La partida ha terminado.
 */
 
 session_start();
@@ -81,7 +82,7 @@ if (isset($_GET['accion'])){
             break;
 
         case 'elegir_carta_inicio':
-            if ($estado!='Inicio' || $_GET['pista']==null){
+            if ($estado!='Inicio' || !isset($_GET['pista']) || $_GET['pista']==null){
                 die('Error: El estado actual no es el inicial o faltan datos');
             }
 

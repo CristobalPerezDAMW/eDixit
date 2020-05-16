@@ -272,7 +272,7 @@ function ponerEstado(eligeCartaAnterior) {
                 div.appendChild(p);
             }
     } else if (estadoJuego == "Puntuacion") {
-        mensaje1.innerHTML = "Estado Puntuacion";
+        mensaje1.innerHTML = "Estado Puntuación";
         mensaje2.innerHTML = "¡Hemos llegado al final del turno y cuando lo termine deberías ver los puntos!";
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
