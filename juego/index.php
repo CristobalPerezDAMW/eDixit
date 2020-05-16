@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 'on');
 // Destáquese que todos los comentarios desaparecerán en las versiones de producción
 /* Estados del juego:
     "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
@@ -35,24 +37,54 @@ if (isset($_GET['accion'])){
         $sql = 'SELECT Jugador FROM `partida_jugador` WHERE `CartaElegida` is NULL AND `Partida`=\''.$id_partida.'\'';
         // die($sql);
         $resultado = $bbdd->query($sql);
-        while ($fila = mysqli_fetch_array($resultado)){
-            $faltan[] = $fila[0];
+        $faltan_elegir = array();
+        if ($resultado!==false)
+            while ($fila = mysqli_fetch_array($resultado)){
+                $faltan_elegir[] = $fila[0];
+            }
+
+        if ($estado=='Votacion'){
+            $sql = 'SELECT CartaElegida FROM `partida_jugador` WHERE `Partida`=\''.$id_partida.'\'';
+            $resultado = $bbdd->query($sql);
+            while ($fila = mysqli_fetch_array($resultado)){
+                $cartas_votacion[] = $fila[0];
+            }
+            shuffle($cartas_votacion);
+            
+            $sql = 'SELECT Jugador FROM `partida_jugador` WHERE `CartaVotada` is NULL AND `Partida`=\''.$id_partida.'\'';
+            // die($sql);
+            $resultado = $bbdd->query($sql);
+            $faltan_votar = array();
+            if ($resultado!==false)
+                while ($fila = mysqli_fetch_array($resultado)){
+                    $faltan_votar[] = $fila[0];
+                }
+
+            $sql = 'SELECT CartaVotada FROM `partida_jugador` WHERE Jugador=\''.$_SESSION['usuario_correo'].'\' AND `Partida`=\''.$id_partida.'\'';
+            $resultado = $bbdd->query($sql);
+            $carta_votada = 'null';
+            if ($resultado!==false)
+                $carta_votada = mysqli_fetch_array($resultado)[0];
         }
     }else {
-        die('Error: ¿La partida no existe?');
+        die('Error: El jugador no está en ninguna partida');
     }
-    $resultado->free();
+    if ($resultado!==false)
+        $resultado->free();
 
     switch($_GET['accion']){
         case 'get_estado_partida':
             $bbdd->close();
-            die($estado.';'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';'.$carta_elegida.';'.implode(',', $faltan));
+            die($estado.';'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';'.$carta_elegida.';'.implode(',', $faltan_elegir).
+            (isset($cartas_votacion) ? ';'.implode(',',$cartas_votacion) .';'.$carta_votada.';'.implode(',',$faltan_votar) : '')
+            );
             break;
 
         case 'elegir_carta_inicio':
             if ($estado!='Inicio' || $_GET['pista']==null){
                 die('Error: El estado actual no es el inicial o faltan datos');
             }
+
             $sql = 'UPDATE `partidas` SET `Cuentacuentos`=\''.$_SESSION['usuario_correo'].'\', `Pista`=\''.$_GET['pista'].'\', `Estado`=\'PensandoCartas\', `UltActivo`=CURRENT_TIME() WHERE `Id`=\''.$id_partida.'\'';
             file_put_contents('log.txt', $sql);
             $bbdd->query($sql);
@@ -74,13 +106,13 @@ if (isset($_GET['accion'])){
             // die($sql);
             $bbdd->query($sql);
             $bbdd->close();
-            foreach ($faltan as $key => $value) {
+            foreach ($faltan_elegir as $key => $value) {
                 if ($value==$_SESSION['usuario_correo']){
-                    unset($faltan[$key]);
+                    unset($faltan_elegir[$key]);
                     break;
                 }
             }
-            die('PensandoCartas;'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';null;'.implode(',', $faltan));
+            die('PensandoCartas;'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';null;'.implode(',', $faltan_elegir));
             break;
     
         case 'elegir_carta_pensando_cartas':
@@ -98,12 +130,11 @@ if (isset($_GET['accion'])){
             $mano_jugador = implode(':', $mano_jugador);
 
             $sql = 'UPDATE `partida_jugador` SET `Mano`=\''.$mano_jugador.'\', `CartaElegida`=\''.$_GET['carta_elegida'].'\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
-
             // die($sql);
             $bbdd->query($sql);
 
-            // Tiene que ser 1 porque es el número antes de añadir el voto actual, y sabemos a ciencia cierta que antes no estaba registrado y ahora sí, de modo que si sólo hay 1 en $faltan es que ya no queda nadie
-            if (count($faltan) == 1){
+            // Tiene que ser 1 porque es el número antes de añadir la carta elegida actual, y sabemos a ciencia cierta que antes no estaba registrado y ahora sí, de modo que si sólo hay 1 en $faltan_elegir es que ya no queda nadie
+            if (count($faltan_elegir) == 1){
                 $sql = 'UPDATE `partidas` SET `Estado`=\'Votacion\', `UltActivo`=CURRENT_TIME() WHERE `Id`=\''.$id_partida.'\'';
                 $bbdd->query($sql);
                 $bbdd->close();
@@ -112,7 +143,27 @@ if (isset($_GET['accion'])){
                 $bbdd->close();
                 die('PensandoCartas');
             }
-            die('Votacion;'.$mano_jugador.';null;null;'.$carta_elegida.';'.implode(',', $faltan));
+            // die('PensandoCartas;'.$mano_jugador.';null;null;'.$carta_elegida.';'.implode(',', $faltan_elegir));
+            break;
+
+        case 'votar_carta':
+            if ($estado!='Votacion' || !isset($_GET['carta_votada']) || isset($carta_votada)){
+                die('Error: El estado actual no es Votacion o ya has elegido una carta - '.isset($carta_votada));
+            }
+
+            $sql = 'UPDATE `partida_jugador` SET `CartaVotada`=\''.$_GET['carta_votada'].'\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
+            $bbdd->query($sql);
+
+            // Tiene que ser 2 porque es el número antes de añadir el voto actual, y sabemos a ciencia cierta que antes no estaba registrado y ahora sí, de modo que si sólo hay 2 en $faltan_votar es que antes de añadir este voto sólo quedaban el actual y el Cuentacuentos, que no vota
+            if (count($faltan_votar) == 2){
+                $sql = 'UPDATE `partidas` SET `Estado`=\'Puntuacion\', `UltActivo`=CURRENT_TIME() WHERE `Id`=\''.$id_partida.'\'';
+                $bbdd->query($sql);
+                $bbdd->close();
+                die('Puntuacion');
+            } else {
+                $bbdd->close();
+                die('Votacion');
+            }
             break;
     }
 }
@@ -231,7 +282,7 @@ var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
         <p id="mensaje1"></p>
         <p id="mensaje2"></p>
         <div id="cartas_votacion">
-            <div>
+            <!-- <div>
                 <img src="cartas/carta1.jpg" alt="Cartita">
                 <p>1</p>
             </div>
@@ -242,7 +293,7 @@ var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
             <div>
                 <img src="cartas/carta13.jpg" alt="Cartita">
                 <p>3</p>
-            </div>
+            </div> -->
         </div>
     </div>
     <img id="mensajeImagen"/>

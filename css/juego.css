@@ -170,6 +170,15 @@ body {
   width: 100%;
   border: 3px solid blue;
 }
+#cartas_votacion > div > img.elegida {
+  border: 3px solid yellow;
+}
+#cartas_votacion > div > img.votada {
+  border: 3px solid green;
+}
+#cartas_votacion > div > img.no_elegible {
+  border: 3px solid gray;
+}
 #cartas_votacion > div > p {
   position: absolute;
   top: 0px;
@@ -183,6 +192,15 @@ body {
   color: #333;
   text-align: center;
   font: 32px fantasy;
+}
+#cartas_votacion > div > p.elegida {
+  border: 2px solid yellow;
+}
+#cartas_votacion > div > p.votada {
+  border: 2px solid green;
+}
+#cartas_votacion > div > p.no_elegible {
+  border: 2px solid gray;
 }
 #cartas_votacion > div:hover {
   cursor: pointer;

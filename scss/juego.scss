@@ -187,6 +187,15 @@ body {
             width: 100%;
             border: 3px solid blue;
         }
+        >img.elegida {
+            border: 3px solid yellow;
+        }
+        >img.votada {
+            border: 3px solid green;
+        }
+        >img.no_elegible {
+            border: 3px solid gray;
+        }
         >p {
             position: absolute;
             top: 0px;
@@ -200,6 +209,15 @@ body {
             color: #333;
             text-align: center;
             font: 32px fantasy;
+        }
+        >p.elegida {
+            border: 2px solid yellow;
+        }
+        >p.votada {
+            border: 2px solid green;
+        }
+        >p.no_elegible {
+            border: 2px solid gray;
         }
     }
     >div:hover {

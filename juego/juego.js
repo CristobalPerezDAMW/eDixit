@@ -41,8 +41,6 @@ function objetoXHR() {
 function getAsync(url, saltarIndicador = false) {
     if (ajaxXHR) {
         // document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
-        // console.log(url);
-        // console.log(encodeURI(url));
         ajaxXHR.open('GET', encodeURI(url), true);
         ajaxXHR.onreadystatechange = enPeticionLista;
         ajaxXHR.send(null);
@@ -55,9 +53,11 @@ function enPeticionLista(saltarIndicador = false) {
         if (this.responseText.startsWith('Error') !== false) {
             console.log(this.responseText);
         } else {
-            // console.log(this.responseText);
             cartaElegida = 0;
             listaFaltan = new Array();
+            cartasVotacion = new Array();
+            cartaVotada = "";
+            listaFaltanVotar = new Array();
             let datos = this.responseText.split(";");
             if (datos.length > 1) {
                 if (datos[1] != "null")
@@ -78,6 +78,21 @@ function enPeticionLista(saltarIndicador = false) {
                             if (datos.length > 5) {
                                 if (datos[5] != "")
                                     listaFaltan = datos[5].split(',');
+
+                                if (datos.length > 6) {
+                                    if (datos[6] != "null")
+                                        cartasVotacion = datos[6].split(',');
+
+                                    if (datos.length > 7) {
+                                        if (datos[7] != "null")
+                                            cartaVotada = datos[7];
+
+                                        if (datos.length > 8) {
+                                            if (datos[8] != "")
+                                                faltanVotar = datos[8].split(',');
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -99,8 +114,10 @@ async function pedirEstadoJuego() {
 };
 
 var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, mensajeImagen, mensajePista, divVotacion, divCartas, eligeCarta, cartaElegida = 0,
-    cartaVotada = 0,
     pista = "",
+    cartaVotada = 0,
+    cartasVotacion = new Array(),
+    cartaVotada = 'null',
     listaFaltan = new Array();
 
 crearEvento(window, "load", init);
@@ -138,10 +155,6 @@ function init() {
     tuMano.forEach(foreachMano);
     divTusCartas.appendChild(divCartas);
 
-    crearEvento(divVotacion, "click", function() {
-        alert("Has hecho click");
-    });
-
     pedirEstadoJuego();
 }
 
@@ -149,7 +162,7 @@ function ponerEstado(eligeCartaAnterior) {
     //Limpieza del estado anterior
     divCartas.classList.remove("quitar");
     divMensajes.classList.remove("quitar");
-    mensaje2.classList.remove("quitar");
+    // mensaje2.classList.remove("quitar");
     mensajeImagen.classList.add("quitar");
     mensajePista.classList.add("quitar");
     divVotacion.classList.add("quitar");
@@ -186,18 +199,81 @@ function ponerEstado(eligeCartaAnterior) {
             mensaje2.innerHTML = "Debes esperar mientras los demás eligen su carta para esta ronda.";
         }
     } else if (estadoJuego == "Votacion") {
+        divCartas.classList.add("quitar");
+        divVotacion.classList.remove("quitar");
         if (cuentacuentos == jugadores[jugadorIndice].correo) {
-            mensaje1.innerHTML = "Esperando";
-            mensaje2.innerHTML = "Debes esperar mientras los demás votan una carta.";
+            mensaje1.innerHTML = "Eres el Cuentacuentos";
+            mensaje2.innerHTML = "Debes esperar a que voten los demás jugadores.";
         } else if (cartaVotada == 0) {
-            divCartas.classList.add("quitar");
-            divVotacion.classList.remove("quitar");
-            mensaje2.classList.add("quitar");
-            mensaje1.innerHTML = "Toca votar carta:";
+            mensaje1.innerHTML = "¿Qué carta es del cuentacuentos?";
+            mensaje2.innerHTML = "La pista es: " + pista;
         } else {
             mensaje1.innerHTML = "Has elegido carta";
             mensaje2.innerHTML = "Debes esperar mientras los demás votan una carta.";
         }
+
+        let yaEstanColocadas = false;
+        //Break casero, para que cuando no haya muchas cartas tampoco se tire mucho rato en este bucle
+        try {
+            divVotacion.childNodes.forEach(nodo => {
+                if (nodo.nodeType == 1) {
+                    yaEstanColocadas = true;
+                    throw "break";
+                }
+            });
+        } catch (e) {
+            if (e != "break") {
+                throw e;
+            }
+        }
+        if (!yaEstanColocadas)
+            for (let i = 0; i < cartasVotacion.length; i++) {
+                let div = document.createElement("div");
+                let img = document.createElement("img");
+                let p = document.createElement("p");
+
+                if (cartasVotacion[i] == cartaElegida) {
+                    div.title = "Esta carta la has colocado tú";
+                    img.classList.add("elegida");
+                    p.classList.add("elegida");
+                    if (jugadores[jugadorIndice].correo != cuentacuentos)
+                        crearEvento(div, "click", function(event) {
+                            alert("No puedes votar la carta que tú mismo has puesto");
+                        });
+                } else if (cartasVotacion[i] == cartaVotada) {
+                    div.title = "Esta carta la has votado tú";
+                    img.classList.add("votada");
+                    p.classList.add("votada");
+                } else if (cartaVotada != "" || jugadores[jugadorIndice].correo == cuentacuentos) {
+                    div.title = "No puedes elegir carta";
+                    img.classList.add("no_elegible");
+                    p.classList.add("no_elegible");
+                    if (jugadores[jugadorIndice].correo != cuentacuentos)
+                        crearEvento(div, "click", function(event) {
+                            alert("Ya has votado alguna carta");
+                        });
+                } else {
+                    div.title = "Podría ser ésta la carta del Cuentacuentos";
+                    crearEvento(div, "click", function(event) {
+                        alert(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
+                        getAsync(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
+                    });
+                }
+
+                // div.style = "max-width: " + (100 / cartasVotacion.length) + "%";
+                img.src = "cartas/carta" + cartasVotacion[i] + ".jpg";
+                img.alt = "Carta número " + i + 1;
+                img.dataset.numeroCarta = cartasVotacion[i];
+                p.innerHTML = i + 1;
+                p.dataset.numeroCarta = cartasVotacion[i];
+
+                divVotacion.appendChild(div);
+                div.appendChild(img);
+                div.appendChild(p);
+            }
+    } else if (estadoJuego == "Puntuacion") {
+        mensaje1.innerHTML = "Estado Puntuacion";
+        mensaje2.innerHTML = "¡Hemos llegado al final del turno y cuando lo termine deberías ver los puntos!";
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
         // divMensajes.classList.add("quitar");
@@ -221,22 +297,18 @@ function ponerEstado(eligeCartaAnterior) {
                 }
             }
             if (!sinCarta) {
-                // console.log("Carta " + numCarta + " sigue en la mano");
                 if (eligeCarta != eligeCartaAnterior) {
                     currentValue.classList.remove("elegible");
                     if (eligeCarta) {
-                        // console.log("Dando evento a " + currentValue);
                         crearEvento(currentValue, "click", function() { elegirCarta(numCarta, currentIndex) });
                         currentValue.classList.add("elegible");
                     } else {
-                        // console.log("Quitando eventos a " + currentValue);
                         let imgClon = currentValue.cloneNode(true);
                         imgClon.dataset.numeroCarta = numCarta;
                         currentValue.parentNode.replaceChild(imgClon, currentValue);
                     }
                 }
             } else {
-                console.log("Carta " + numCarta + " YA NO sigue en la mano");
                 currentValue.parentNode.removeChild(currentValue);
             }
         }
@@ -249,15 +321,11 @@ function ponerEstado(eligeCartaAnterior) {
                 if (i == jugadorIndice) {
                     currentValue.classList.add("tuPerfil");
                 }
-                // console.log("Comprobando nodo " + currentValue + ", " + currentIndex);
-                // console.log(currentValue);
                 if (jugadores[i].correo == cuentacuentos) {
                     currentValue.classList.add("cuentacuentos");
-                    // currentValue.classList.add("eligiendo");
                     currentValue.title = jugadores[i].nombre + " (" + jugadores[i].correo + ") ¡Cuentacuentos!";
                 } else {
                     currentValue.classList.remove("cuentacuentos");
-                    // currentValue.classList.add("eligiendo");
                     currentValue.title = jugadores[i].nombre + " (" + jugadores[i].correo + ")";
                 }
                 for (let j = 0; j < listaFaltan.length; j++) {
@@ -275,7 +343,6 @@ function ponerEstado(eligeCartaAnterior) {
 }
 
 function elegirCarta(carta, indice) {
-    // alert("hola, has seleccionado la carta num " + indice + ", que es la " + carta);
     let pista = "";
     if (estadoJuego == "Inicio") {
         while (pista == "")
