@@ -45,14 +45,14 @@ if (isset($_GET['accion'])){
             }
 
         if ($estado=='Votacion'){
-            $sql = 'SELECT CartaElegida FROM `partida_jugador` WHERE `Partida`=\''.$id_partida.'\'';
+            $sql = 'SELECT `CartaElegida` FROM `partida_jugador` WHERE `Partida`=\''.$id_partida.'\'';
             $resultado = $bbdd->query($sql);
             while ($fila = mysqli_fetch_array($resultado)){
                 $cartas_votacion[] = $fila[0];
             }
             shuffle($cartas_votacion);
             
-            $sql = 'SELECT Jugador FROM `partida_jugador` WHERE `CartaVotada` is NULL AND `Partida`=\''.$id_partida.'\'';
+            $sql = 'SELECT `Jugador` FROM `partida_jugador` WHERE `CartaVotada` is NULL AND `Partida`=\''.$id_partida.'\'';
             // die($sql);
             $resultado = $bbdd->query($sql);
             $faltan_votar = array();
@@ -61,11 +61,14 @@ if (isset($_GET['accion'])){
                     $faltan_votar[] = $fila[0];
                 }
 
-            $sql = 'SELECT CartaVotada FROM `partida_jugador` WHERE Jugador=\''.$_SESSION['usuario_correo'].'\' AND `Partida`=\''.$id_partida.'\'';
+            $sql = 'SELECT `CartaVotada` FROM `partida_jugador` WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\' AND `Partida`=\''.$id_partida.'\'';
             $resultado = $bbdd->query($sql);
             $carta_votada = 'null';
             if ($resultado!==false)
                 $carta_votada = mysqli_fetch_array($resultado)[0];
+        } else if ($estado == 'Puntuacion'){
+            $sql = 'SELECT `PuntuacionRonda` FROM `partida_jugador` WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\' AND `Partida`=\''.$id_partida.'\'';
+            $puntuacion_ronda = mysqli_fetch_array($bbdd->query($sql))[0];
         }
     }else {
         die('Error: El jugador no está en ninguna partida');
@@ -77,7 +80,8 @@ if (isset($_GET['accion'])){
         case 'get_estado_partida':
             $bbdd->close();
             die($estado.';'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';'.$carta_elegida.';'.implode(',', $faltan_elegir).
-            (isset($cartas_votacion) ? ';'.implode(',',$cartas_votacion) .';'.$carta_votada.';'.implode(',',$faltan_votar) : '')
+            (isset($cartas_votacion) ? ';'.implode(',',$cartas_votacion) .';'.$carta_votada.';'.implode(',',$faltan_votar) : '').
+            (isset($puntuacion_ronda) ? $puntuacion_ronda : 'null')
             );
             break;
 
@@ -159,6 +163,41 @@ if (isset($_GET['accion'])){
                 if (count($faltan_votar) == 2){
                     $sql = 'UPDATE `partidas` SET `Estado`=\'Puntuacion\', `UltActivo`=CURRENT_TIME() WHERE `Id`=\''.$id_partida.'\'';
                     $bbdd->query($sql);
+
+                    $sql = 'SELECT `Jugador`, `CartaElegida`, `CartaVotada` FROM `partida_jugador` WHERE `Id`=\''.$id_partida.'\'';
+                    $resultado = $bbdd->query($sql);
+                    while ($fila = mysqli_fetch_array($resultado)){
+                        //En el tercer valor de cada jugador se guardan sus puntos para esta ronda
+                        $jugadores[$fila[0]] = array($fila[1], $fila[2], 0);
+                    }
+
+                    //Bueno, bueno. El algoritmo para los puntos. El resumen es que los reparte como dicen las normas del juego, para lo que hacen falta muchos bucles y muchos datos. Debería explicarlo en persona.
+                    $x3Acierto = false;
+                    $x3Fallo = false;
+                    foreach ($jugadores as $jugador => $datos) {
+                        foreach ($jugadores as $jJ => $dJ) {
+                            if ($dJ[1] == $datos[0]){
+                                $datos[3]++;
+                            }
+                            if ($dJ[1] == $jugadores[$cuentacuentos]){
+                                $x3Acierto = true;
+                            } else {
+                                $x3Fallo = true;
+                            }
+                        }
+                    }
+                    foreach ($jugadores as $jugador => $datos) {
+                        if ($x3Acierto && $x3Fallo){
+                            if ($datos[1] == $jugadores[$cuentacuentos]){
+                                $datos[3]+= 3;
+                            }
+                        } else if ($jugador != $cuentacuentos){
+                            $datos[3]+= 2;
+                        }
+                        $sql = 'UPDATE `partida_jugador` SET `PuntuacionRonda`=\''.$datos[3].'\' WHERE `Jugador`=\''.$jugador.'\' AND `Id`=\''.$id_partida.'\'';
+                        $bbdd->query($sql);
+                    }
+
                     $bbdd->close();
                     die('Puntuacion');
                 } else {
@@ -175,7 +214,7 @@ if (isset($_GET['accion'])){
                 $sql = 'UPDATE `partida_jugador` SET `CartaVotada`=NULL, `CartaElegida`=NULL WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
                 $bbdd->query($sql);
                 
-                $sql = 'SELECT Count(*) FROM `partida_jugador` WHERE `CartaVotada`=NULL AND `Id`=\''.$id_partida.'\'';
+                $sql = 'SELECT Count(*) FROM `partida_jugador` WHERE `Puntuacion`==NULL AND `Id`=\''.$id_partida.'\'';
                 $resultado = $bbdd->query($sql);
                 $faltan_aceptar = mysqli_fetch_array($resultado)[0];
 

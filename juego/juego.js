@@ -90,6 +90,11 @@ function enPeticionLista(saltarIndicador = false) {
                                         if (datos.length > 8) {
                                             if (datos[8] != "")
                                                 faltanVotar = datos[8].split(',');
+
+                                            if (datos.length > 9) {
+                                                if (datos[9] != "null")
+                                                    puntuacionRonda = datos[9];
+                                            }
                                         }
                                     }
                                 }
@@ -118,7 +123,8 @@ var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1,
     cartaVotada = 0,
     cartasVotacion = new Array(),
     cartaVotada = 'null',
-    listaFaltan = new Array();
+    puntuacionRonda = 0;
+listaFaltan = new Array();
 
 crearEvento(window, "load", init);
 
@@ -255,7 +261,7 @@ function ponerEstado(eligeCartaAnterior) {
                 } else {
                     div.title = "Podría ser ésta la carta del Cuentacuentos";
                     crearEvento(div, "click", function(event) {
-                        alert(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
+                        // alert(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
                         getAsync(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
                     });
                 }
@@ -273,7 +279,7 @@ function ponerEstado(eligeCartaAnterior) {
             }
     } else if (estadoJuego == "Puntuacion") {
         mensaje1.innerHTML = "Estado Puntuación";
-        mensaje2.innerHTML = "¡Hemos llegado al final del turno y cuando lo termine deberías ver los puntos!";
+        mensaje2.innerHTML = "Has conseguido " + puntuacionRonda + " puntos esta ronda.";
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
         // divMensajes.classList.add("quitar");
