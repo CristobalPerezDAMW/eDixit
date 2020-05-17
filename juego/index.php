@@ -80,8 +80,8 @@ if (isset($_GET['accion'])){
         case 'get_estado_partida':
             $bbdd->close();
             die($estado.';'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';'.$carta_elegida.';'.implode(',', $faltan_elegir).
-            (isset($cartas_votacion) ? ';'.implode(',',$cartas_votacion) .';'.$carta_votada.';'.implode(',',$faltan_votar) : '').
-            (isset($puntuacion_ronda) ? $puntuacion_ronda : 'null')
+            (isset($cartas_votacion) ? ';'.implode(',',$cartas_votacion) .';'.$carta_votada.';'.implode(',',$faltan_votar) : ';;null;').
+            (isset($puntuacion_ronda) ? ';'.$puntuacion_ronda : 'null')
             );
             break;
 
@@ -91,7 +91,6 @@ if (isset($_GET['accion'])){
             }
 
             $sql = 'UPDATE `partidas` SET `Cuentacuentos`=\''.$_SESSION['usuario_correo'].'\', `Pista`=\''.$_GET['pista'].'\', `Estado`=\'PensandoCartas\', `UltActivo`=CURRENT_TIME() WHERE `Id`=\''.$id_partida.'\'';
-            file_put_contents('log.txt', $sql);
             $bbdd->query($sql);
             
             // $sql = 'UPDATE `partida_jugador` SET `CartaElegida`=\''.$_GET['carta_elegida'].'\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\' AND `Partida`=\''.$id_partida.'\'';
@@ -164,12 +163,29 @@ if (isset($_GET['accion'])){
                     $sql = 'UPDATE `partidas` SET `Estado`=\'Puntuacion\', `UltActivo`=CURRENT_TIME() WHERE `Id`=\''.$id_partida.'\'';
                     $bbdd->query($sql);
 
-                    $sql = 'SELECT `Jugador`, `CartaElegida`, `CartaVotada` FROM `partida_jugador` WHERE `Id`=\''.$id_partida.'\'';
+                    $sql = 'SELECT `Jugador`, `CartaElegida`, `CartaVotada` FROM `partida_jugador` WHERE `Partida`=\''.$id_partida.'\'';
                     $resultado = $bbdd->query($sql);
                     while ($fila = mysqli_fetch_array($resultado)){
                         //En el tercer valor de cada jugador se guardan sus puntos para esta ronda
                         $jugadores[$fila[0]] = array($fila[1], $fila[2], 0);
                     }
+
+                    /*
+                    Error, no existe el estado <br />
+                    <b>Warning</b>:  mysqli_fetch_array() expects parameter 1 to be mysqli_result, boolean given in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>168</b><br />
+                    <br />
+                    <b>Notice</b>:  Undefined variable: jugadores in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>176</b><br />
+                    <br />
+                    <b>Warning</b>:  Invalid argument supplied for foreach() in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>176</b><br />
+                    <br />
+                    <b>Notice</b>:  Undefined variable: jugadores in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>188</b><br />
+                    <br />
+                    <b>Warning</b>:  Invalid argument supplied for foreach() in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>188</b><br />
+                    <br />
+                    <b>Notice</b>:  Undefined variable: puntuacion_ronda in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>202</b><br />
+                    Puntuacion
+                    */
+
 
                     //Bueno, bueno. El algoritmo para los puntos. El resumen es que los reparte como dicen las normas del juego, para lo que hacen falta muchos bucles y muchos datos. Debería explicarlo en persona.
                     $x3Acierto = false;
@@ -194,12 +210,13 @@ if (isset($_GET['accion'])){
                         } else if ($jugador != $cuentacuentos){
                             $datos[3]+= 2;
                         }
-                        $sql = 'UPDATE `partida_jugador` SET `PuntuacionRonda`=\''.$datos[3].'\' WHERE `Jugador`=\''.$jugador.'\' AND `Id`=\''.$id_partida.'\'';
+                        $sql = 'UPDATE `partida_jugador` SET `PuntuacionRonda`=\''.$datos[3].'\' WHERE `Jugador`=\''.$jugador.'\' AND `Partida`=\''.$id_partida.'\'';
+                        file_put_contents('log.txt', $sql);
                         $bbdd->query($sql);
                     }
 
                     $bbdd->close();
-                    die('Puntuacion');
+                    die('Puntuacion;null;null;null;null;null;;;;'.$puntuacion_ronda);
                 } else {
                     $bbdd->close();
                     die('Votacion');
@@ -214,12 +231,12 @@ if (isset($_GET['accion'])){
                 $sql = 'UPDATE `partida_jugador` SET `CartaVotada`=NULL, `CartaElegida`=NULL WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
                 $bbdd->query($sql);
                 
-                $sql = 'SELECT Count(*) FROM `partida_jugador` WHERE `Puntuacion`==NULL AND `Id`=\''.$id_partida.'\'';
+                $sql = 'SELECT Count(*) FROM `partida_jugador` WHERE `Puntuacion`==NULL AND `Partida`=\''.$id_partida.'\'';
                 $resultado = $bbdd->query($sql);
                 $faltan_aceptar = mysqli_fetch_array($resultado)[0];
 
                 if (count($faltan_aceptar) == 1){
-                    $sql = 'SELECT `Jugador`, `Mano` FROM `partida_jugador` WHERE `Id`=\''.$id_partida.'\' ORDER BY `Jugador`';
+                    $sql = 'SELECT `Jugador`, `Mano` FROM `partida_jugador` WHERE `Partida`=\''.$id_partida.'\' ORDER BY `Jugador`';
                     $resultado = $bbdd->query($sql);
                     $cc = 0;
                     $i = -1;
@@ -245,7 +262,7 @@ if (isset($_GET['accion'])){
 
                     for ($i=0; $i < count($jugadores); $i++) { 
                         $jugadores[$i][1].=':'.array_shift($mazo);
-                        $sql = 'UPDATE `partida_jugador` SET `Mano`=\''.$jugadores[$i][1].'\' WHERE `Jugador`=\''.$jugadores[$i][0].'\' AND `Id`=\''.$id_partida.'\'';
+                        $sql = 'UPDATE `partida_jugador` SET `Mano`=\''.$jugadores[$i][1].'\' WHERE `Jugador`=\''.$jugadores[$i][0].'\' AND `Partida`=\''.$id_partida.'\'';
                         $bbdd->query($sql);
                     }
 
