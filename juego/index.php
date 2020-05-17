@@ -171,19 +171,17 @@ if (isset($_GET['accion'])){
                     }
 
                     /*
-                    Error, no existe el estado <br />
-                    <b>Warning</b>:  mysqli_fetch_array() expects parameter 1 to be mysqli_result, boolean given in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>168</b><br />
-                    <br />
-                    <b>Notice</b>:  Undefined variable: jugadores in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>176</b><br />
-                    <br />
-                    <b>Warning</b>:  Invalid argument supplied for foreach() in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>176</b><br />
-                    <br />
-                    <b>Notice</b>:  Undefined variable: jugadores in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>188</b><br />
-                    <br />
-                    <b>Warning</b>:  Invalid argument supplied for foreach() in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>188</b><br />
-                    <br />
-                    <b>Notice</b>:  Undefined variable: puntuacion_ronda in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>202</b><br />
-                    Puntuacion
+Error, no existe el estado <br />
+<b>Notice</b>:  Undefined offset: 3 in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>196</b><br />
+<br />
+<b>Notice</b>:  Undefined offset: 3 in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>213</b><br />
+<br />
+<b>Notice</b>:  Undefined offset: 3 in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>211</b><br />
+<br />
+<b>Notice</b>:  Undefined offset: 3 in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>211</b><br />
+<br />
+<b>Notice</b>:  Undefined variable: puntuacion_ronda in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>219</b><br />
+Puntuacion
                     */
 
 
@@ -193,7 +191,7 @@ if (isset($_GET['accion'])){
                     foreach ($jugadores as $jugador => $datos) {
                         foreach ($jugadores as $jJ => $dJ) {
                             if ($dJ[1] == $datos[0]){
-                                $datos[3]++;
+                                $datos[2]++;
                             }
                             if ($dJ[1] == $jugadores[$cuentacuentos]){
                                 $x3Acierto = true;
@@ -205,10 +203,10 @@ if (isset($_GET['accion'])){
                     foreach ($jugadores as $jugador => $datos) {
                         if ($x3Acierto && $x3Fallo){
                             if ($datos[1] == $jugadores[$cuentacuentos]){
-                                $datos[3]+= 3;
+                                $datos[2]+= 3;
                             }
                         } else if ($jugador != $cuentacuentos){
-                            $datos[3]+= 2;
+                            $datos[2]+= 2;
                         }
                         $sql = 'UPDATE `partida_jugador` SET `PuntuacionRonda`=\''.$datos[3].'\' WHERE `Jugador`=\''.$jugador.'\' AND `Partida`=\''.$id_partida.'\'';
                         file_put_contents('log.txt', $sql);
@@ -216,7 +214,7 @@ if (isset($_GET['accion'])){
                     }
 
                     $bbdd->close();
-                    die('Puntuacion;null;null;null;null;null;;;;'.$puntuacion_ronda);
+                    die('Puntuacion;null;null;null;null;null;;;;'.$jugadores[$_SESSION['usuario_correo']][2]);
                 } else {
                     $bbdd->close();
                     die('Votacion');
