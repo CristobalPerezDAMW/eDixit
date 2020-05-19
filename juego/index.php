@@ -171,47 +171,52 @@ if (isset($_GET['accion'])){
                     }
 
                     /*
-Error, no existe el estado <br />
-<b>Notice</b>:  Undefined offset: 3 in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>196</b><br />
-<br />
-<b>Notice</b>:  Undefined offset: 3 in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>213</b><br />
-<br />
-<b>Notice</b>:  Undefined offset: 3 in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>211</b><br />
-<br />
-<b>Notice</b>:  Undefined offset: 3 in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>211</b><br />
-<br />
-<b>Notice</b>:  Undefined variable: puntuacion_ronda in <b>/home/cristobal/public_html/juego/index.php</b> on line <b>219</b><br />
-Puntuacion
+                    admin - Elegida: 3, Votada: NULL, Puntuación deseada: 3
+                    cris - Elegida: 10, Votada: 3, Puntuación deseada: 3
+                    usuario - Elegida: 13, Votada: 10, Puntuación deseada: 0
                     */
 
-
-                    //Bueno, bueno. El algoritmo para los puntos. El resumen es que los reparte como dicen las normas del juego, para lo que hacen falta muchos bucles y muchos datos. Debería explicarlo en persona.
+                    //Bueno, bueno. El algoritmo para los puntos. El resumen es que los reparte como dicen las normas del juego, para lo que hacen falta muchos bucles.
                     $x3Acierto = false;
                     $x3Fallo = false;
+                    $log = "¡!\n";
                     foreach ($jugadores as $jugador => $datos) {
                         foreach ($jugadores as $jJ => $dJ) {
-                            if ($dJ[1] == $datos[0]){
-                                $datos[2]++;
+                            if ($jJ != $cuentacuentos){
+                                if ($dJ[1] == $datos[0]) {
+                                    $datos[2]++;
+                                }
                             }
-                            if ($dJ[1] == $jugadores[$cuentacuentos]){
-                                $x3Acierto = true;
-                            } else {
-                                $x3Fallo = true;
-                            }
+                            
+                        }
+                        if ($datos[1] == $jugadores[$cuentacuentos][0]) {
+                            $x3Acierto = true;
+                            $log .= 'Comprobación '.$jugador.' con el cuentacuentos: '.$datos[1].'=='.$jugadores[$cuentacuentos][0]."\n";
+                        } else {
+                            $x3Fallo = true;
+                            $log .= 'Comprobación '.$jugador.' con el cuentacuentos: '.$datos[1].'!='.$jugadores[$cuentacuentos][0]."\n";
                         }
                     }
                     foreach ($jugadores as $jugador => $datos) {
-                        if ($x3Acierto && $x3Fallo){
-                            if ($datos[1] == $jugadores[$cuentacuentos]){
+                        if ($x3Acierto===true && $x3Fallo===true) {
+                            if ($jugador==$cuentacuentos || $datos[1] == $jugadores[$cuentacuentos][0]) {
                                 $datos[2]+= 3;
+                                $log .= 'El jugador '.$jugador." consigue +3 \n";
                             }
-                        } else if ($jugador != $cuentacuentos){
+                        } else if ($jugador != $cuentacuentos) {
                             $datos[2]+= 2;
+                            $log .= 'El jugador '.$jugador." consigue +2 \n";
                         }
-                        $sql = 'UPDATE `partida_jugador` SET `PuntuacionRonda`=\''.$datos[3].'\' WHERE `Jugador`=\''.$jugador.'\' AND `Partida`=\''.$id_partida.'\'';
-                        file_put_contents('log.txt', $sql);
+                        $sql = 'UPDATE `partida_jugador` SET `PuntuacionRonda`=\''.$datos[2].'\' WHERE `Jugador`=\''.$jugador.'\' AND `Partida`=\''.$id_partida.'\'';
                         $bbdd->query($sql);
                     }
+                    file_put_contents('log.txt', var_export($jugadores, true)
+                    ."\nx3Acierto:".var_export($x3Acierto, true)
+                    ."\nx3Fallo: "
+                    .var_export($x3Acierto, true)
+                    ."\n".var_export($cuentacuentos, true)
+                    .$log
+                    );
 
                     $bbdd->close();
                     die('Puntuacion;null;null;null;null;null;;;;'.$jugadores[$_SESSION['usuario_correo']][2]);
