@@ -118,7 +118,7 @@ async function pedirEstadoJuego() {
     }, 2000);
 };
 
-var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, mensajeImagen, mensajePista, divVotacion, divCartas, eligeCarta, cartaElegida = 0,
+var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, mensajeImagen, mensajePista, divVotacion, divCartas, aceptarPuntuacion, eligeCarta, cartaElegida = 0,
     pista = "",
     cartaVotada = 0,
     cartasVotacion = new Array(),
@@ -139,8 +139,9 @@ function init() {
     mensaje2 = document.getElementById("mensaje2");
     mensajeImagen = document.getElementById("mensajeImagen");
     mensajePista = document.getElementById("mensajePista");
-    divVotacion = document.getElementById("cartas_votacion");
+    divVotacion = document.getElementById("cartasVotacion");
     divCartas = document.createElement("div");
+    aceptarPuntuacion = document.getElementById("aceptarPuntuacion");
 
     jugadores.forEach(jugador => {
         let src = jugador.img;
@@ -161,6 +162,12 @@ function init() {
     tuMano.forEach(foreachMano);
     divTusCartas.appendChild(divCartas);
 
+    crearEvento(aceptarPuntuacion, "click", function() {
+        if (estadoJuego == 'Puntuacion') {
+            getAsync(urlGet + "?accion=aceptar_puntuacion");
+        }
+    });
+
     pedirEstadoJuego();
 }
 
@@ -168,10 +175,10 @@ function ponerEstado(eligeCartaAnterior) {
     //Limpieza del estado anterior
     divCartas.classList.remove("quitar");
     divMensajes.classList.remove("quitar");
-    // mensaje2.classList.remove("quitar");
     mensajeImagen.classList.add("quitar");
     mensajePista.classList.add("quitar");
     divVotacion.classList.add("quitar");
+    aceptarPuntuacion.classList.add("quitar");
 
     eligeCarta = false;
     if (estadoJuego == "Inicio") {
@@ -279,7 +286,12 @@ function ponerEstado(eligeCartaAnterior) {
             }
     } else if (estadoJuego == "Puntuacion") {
         mensaje1.innerHTML = "Estado Puntuación";
-        mensaje2.innerHTML = "Has conseguido " + puntuacionRonda + " puntos esta ronda.";
+        if (puntuacionRonda != 0) {
+            aceptarPuntuacion.classList.remove("quitar");
+            mensaje2.innerHTML = "Has conseguido " + puntuacionRonda + " puntos esta ronda.";
+        } else {
+            mensaje2.innerHTML = "Esperando a que todos acepten para empezar la siguiente ronda.";
+        }
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
         // divMensajes.classList.add("quitar");
@@ -324,6 +336,7 @@ function ponerEstado(eligeCartaAnterior) {
     divJugadores.childNodes.forEach(
         function(currentValue, currentIndex, listObj) {
             if (currentValue.nodeType == Node.ELEMENT_NODE) {
+                currentValue.classList.remove("eligiendo");
                 if (i == jugadorIndice) {
                     currentValue.classList.add("tuPerfil");
                 }
@@ -338,8 +351,6 @@ function ponerEstado(eligeCartaAnterior) {
                     if (jugadores[i].correo == listaFaltan[j]) {
                         currentValue.classList.add("eligiendo");
                         currentValue.title += " (Está eligiendo carta)";
-                    } else {
-                        currentValue.classList.remove("eligiendo");
                     }
                 }
                 i++;
@@ -359,6 +370,12 @@ function elegirCarta(carta, indice) {
         getAsync(urlGet + "?accion=elegir_carta_inicio&carta_elegida=" + carta + "" + "&pista=" + pista);
     } else if (estadoJuego == "PensandoCartas") {
         getAsync(urlGet + "?accion=elegir_carta_pensando_cartas&carta_elegida=" + carta);
+    } else if (estadoJuego == "PensandoCC") {
+        if (cuentacuentos == jugadores[jugadorIndice].correo) {
+            getAsync(urlGet + "?accion=elegir_carta_pensando_cc&carta_elegida=" + carta);
+        } else {
+            console.log("Error, no se admite durante el estado " + estadoJuego);
+        }
     } else {
         console.log("Error, no se admite durante el estado " + estadoJuego);
         alert("No puedes elegir cartas ahora");

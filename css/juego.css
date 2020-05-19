@@ -154,32 +154,32 @@ body {
   padding: 5%;
 }
 
-#cartas_votacion {
+#cartasVotacion {
   width: 90vw;
   height: 100%;
   display: flex;
   justify-content: space-evenly;
 }
-#cartas_votacion > div {
+#cartasVotacion > div {
   position: relative;
 }
-#cartas_votacion > div > img {
+#cartasVotacion > div > img {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   width: 100%;
   border: 3px solid blue;
 }
-#cartas_votacion > div > img.elegida {
+#cartasVotacion > div > img.elegida {
   border: 3px solid yellow;
 }
-#cartas_votacion > div > img.votada {
+#cartasVotacion > div > img.votada {
   border: 3px solid green;
 }
-#cartas_votacion > div > img.no_elegible {
+#cartasVotacion > div > img.no_elegible {
   border: 3px solid gray;
 }
-#cartas_votacion > div > p {
+#cartasVotacion > div > p {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -193,17 +193,22 @@ body {
   text-align: center;
   font: 32px fantasy;
 }
-#cartas_votacion > div > p.elegida {
+#cartasVotacion > div > p.elegida {
   border: 2px solid yellow;
 }
-#cartas_votacion > div > p.votada {
+#cartasVotacion > div > p.votada {
   border: 2px solid green;
 }
-#cartas_votacion > div > p.no_elegible {
+#cartasVotacion > div > p.no_elegible {
   border: 2px solid gray;
 }
-#cartas_votacion > div:hover {
+#cartasVotacion > div:hover {
   cursor: pointer;
+}
+
+#aceptarPuntuacion {
+  width: 100%;
+  font-size: 2rem;
 }
 
 @media only screen and (min-width: 400px) and (min-height: 400px), screen and (min-height: 400px) {

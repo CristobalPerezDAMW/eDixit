@@ -171,7 +171,7 @@ body {
     padding: 5%;
 }
 
-#cartas_votacion {
+#cartasVotacion {
     // background-color: red;
     width: 90vw;
     height: 100%;
@@ -223,6 +223,11 @@ body {
     >div:hover {
         cursor: pointer;
     }
+}
+
+#aceptarPuntuacion {
+    width: 100%;
+    font-size: 2rem;
 }
 
 @media only screen and (min-width: 400px) and (min-height: 400px),

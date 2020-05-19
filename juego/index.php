@@ -24,16 +24,17 @@ if (isset($_GET['accion'])){
     if (!$bbdd){
         die('Error al conectar la base de datos');
     } 
-    $sql = 'SELECT Id, Estado, Mano, Cuentacuentos, Pista, CartaElegida FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
+    $sql = 'SELECT Id, Estado, Posicion, Mano, Cuentacuentos, Pista, CartaElegida FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
     $resultado = $bbdd->query($sql);
 
     if ($fila = mysqli_fetch_array($resultado)){
         $id_partida = $fila[0];
         $estado = $fila[1];
-        $mano_jugador = $fila[2];
-        $cuentacuentos = $fila[3];
-        $pista = urldecode($fila[4]);
-        $carta_elegida = $fila[5];
+        $posicion = $fila[2];
+        $mano_jugador = $fila[3];
+        $cuentacuentos = $fila[4];
+        $pista = urldecode($fila[5]);
+        $carta_elegida = $fila[6];
 
         $sql = 'SELECT Jugador FROM `partida_jugador` WHERE `CartaElegida` is NULL AND `Partida`=\''.$id_partida.'\'';
         // die($sql);
@@ -179,7 +180,6 @@ if (isset($_GET['accion'])){
                     //Bueno, bueno. El algoritmo para los puntos. El resumen es que los reparte como dicen las normas del juego, para lo que hacen falta muchos bucles.
                     $x3Acierto = false;
                     $x3Fallo = false;
-                    $log = "¡!\n";
                     foreach ($jugadores as $jugador => $datos) {
                         foreach ($jugadores as $jJ => $dJ) {
                             if ($jJ != $cuentacuentos){
@@ -191,32 +191,21 @@ if (isset($_GET['accion'])){
                         }
                         if ($datos[1] == $jugadores[$cuentacuentos][0]) {
                             $x3Acierto = true;
-                            $log .= 'Comprobación '.$jugador.' con el cuentacuentos: '.$datos[1].'=='.$jugadores[$cuentacuentos][0]."\n";
                         } else {
                             $x3Fallo = true;
-                            $log .= 'Comprobación '.$jugador.' con el cuentacuentos: '.$datos[1].'!='.$jugadores[$cuentacuentos][0]."\n";
                         }
                     }
                     foreach ($jugadores as $jugador => $datos) {
                         if ($x3Acierto===true && $x3Fallo===true) {
                             if ($jugador==$cuentacuentos || $datos[1] == $jugadores[$cuentacuentos][0]) {
                                 $datos[2]+= 3;
-                                $log .= 'El jugador '.$jugador." consigue +3 \n";
                             }
                         } else if ($jugador != $cuentacuentos) {
                             $datos[2]+= 2;
-                            $log .= 'El jugador '.$jugador." consigue +2 \n";
                         }
                         $sql = 'UPDATE `partida_jugador` SET `PuntuacionRonda`=\''.$datos[2].'\' WHERE `Jugador`=\''.$jugador.'\' AND `Partida`=\''.$id_partida.'\'';
                         $bbdd->query($sql);
                     }
-                    file_put_contents('log.txt', var_export($jugadores, true)
-                    ."\nx3Acierto:".var_export($x3Acierto, true)
-                    ."\nx3Fallo: "
-                    .var_export($x3Acierto, true)
-                    ."\n".var_export($cuentacuentos, true)
-                    .$log
-                    );
 
                     $bbdd->close();
                     die('Puntuacion;null;null;null;null;null;;;;'.$jugadores[$_SESSION['usuario_correo']][2]);
@@ -227,25 +216,26 @@ if (isset($_GET['accion'])){
                 break;
 
             case 'aceptar_puntuacion':
-                if ($estado!='Puntuacion' || !isset($carta_votada)){
+                if ($estado!='Puntuacion' || !isset($puntuacion_ronda)){
                     die('Error: El estado actual no es Puntuacion o ya has aceptado');
                 }
     
-                $sql = 'UPDATE `partida_jugador` SET `CartaVotada`=NULL, `CartaElegida`=NULL WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
+                $sql = 'UPDATE `partida_jugador` SET `CartaVotada`=NULL, `CartaElegida`=NULL, PuntuacionRonda=NULL, `Posicion`='.($posicion + $puntuacion_ronda).' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
                 $bbdd->query($sql);
                 
-                $sql = 'SELECT Count(*) FROM `partida_jugador` WHERE `Puntuacion`==NULL AND `Partida`=\''.$id_partida.'\'';
+                $sql = 'SELECT Count(*) FROM `partida_jugador` WHERE `PuntuacionRonda` is not NULL AND `Partida`=\''.$id_partida.'\'';
                 $resultado = $bbdd->query($sql);
                 $faltan_aceptar = mysqli_fetch_array($resultado)[0];
 
-                if (count($faltan_aceptar) == 1){
+                //En este caso sería 0 porque se hace antes el UPDATE del actual y después el COUNT para saber cuántos quedan
+                if ($faltan_aceptar == 0){
                     $sql = 'SELECT `Jugador`, `Mano` FROM `partida_jugador` WHERE `Partida`=\''.$id_partida.'\' ORDER BY `Jugador`';
                     $resultado = $bbdd->query($sql);
                     $cc = 0;
                     $i = -1;
                     while ($fila = mysqli_fetch_array($resultado)){
                         $i++;
-                        $jugadores[$i] = array(fila[0], fila[1]);
+                        $jugadores[$i] = array($fila[0], $fila[1]);
                         if ($fila[0] == $cuentacuentos){
                             $cc = $i;
                         }
@@ -276,7 +266,7 @@ if (isset($_GET['accion'])){
                     die('PensandoCC');
                 } else {
                     $bbdd->close();
-                    die('Puntuacion');
+                    die('PensandoCC;null;null;null;null;null;;;;;true');
                 }
                 break;
     }
@@ -395,7 +385,7 @@ var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
     <div id="mensajes">
         <p id="mensaje1"></p>
         <p id="mensaje2"></p>
-        <div id="cartas_votacion">
+        <div id="cartasVotacion">
             <!-- <div>
                 <img src="cartas/carta1.jpg" alt="Cartita">
                 <p>1</p>
@@ -409,6 +399,7 @@ var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
                 <p>3</p>
             </div> -->
         </div>
+        <button id="aceptarPuntuacion">Aceptar</button>
     </div>
     <img id="mensajeImagen"/>
     <p id="mensajePista"></p>
