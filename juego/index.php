@@ -1,4 +1,5 @@
 <?php
+header("Access-Control-Allow-Origin: *");
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 // Destáquese que todos los comentarios desaparecerán en las versiones de producción
@@ -87,7 +88,7 @@ if (isset($_GET['accion'])){
             break;
 
         case 'elegir_carta_inicio':
-            if ($estado!='Inicio' || !isset($_GET['pista']) || $_GET['pista']==null){
+            if ($estado!='Inicio' || !isset($_GET['carta_elegida']) || !isset($_GET['pista']) || $_GET['pista']==null){
                 die('Error: El estado actual no es el inicial o faltan datos');
             }
 

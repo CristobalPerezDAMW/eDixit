@@ -129,6 +129,19 @@ listaFaltan = new Array();
 
 crearEvento(window, "load", init);
 
+function agregarCarta(carta) {
+    img = new Image();
+    img.src = "cartas/carta" + carta + ".jpg";
+    img.title = "Cata " + carta;
+    img.dataset.numeroCarta = carta;
+    img.classList.remove("elegible");
+    if (eligeCarta) {
+        crearEvento(img, "click", function() { elegirCarta(carta, tuMano.length) });
+        img.classList.add("elegible");
+    }
+    divCartas.appendChild(img);
+}
+
 function init() {
     ajaxXHR = new objetoXHR();
 
@@ -154,11 +167,7 @@ function init() {
     });
 
     function foreachMano(item, index) {
-        img = new Image();
-        img.src = "cartas/carta" + item + ".jpg";
-        img.title = "Cata " + item;
-        img.dataset.numeroCarta = item;
-        divCartas.appendChild(img);
+        agregarCarta(item);
     }
     tuMano.forEach(foreachMano);
     divTusCartas.appendChild(divCartas);
@@ -226,6 +235,7 @@ function ponerEstado(eligeCartaAnterior) {
             mensaje2.innerHTML = "Debes esperar mientras los demás votan una carta.";
         }
 
+        //De esta forma no actualizamos las cartas a votar constantemente
         let yaEstanColocadas = false;
         //Break casero, para que cuando no haya muchas cartas tampoco se tire mucho rato en este bucle
         try {
@@ -301,13 +311,28 @@ function ponerEstado(eligeCartaAnterior) {
         mensaje2.innerHTML = "¿Qué esperabas? El juego no está terminado, pero gracias por intentarlo.";
         return;
     }
-    if (cartaElegida != 0) {
-        // eligeCarta = false;
+
+    //Básicamente las siguientes dos cosas hacen que no parpadeen las cartas cada vez que se actualizan los datos pero no la mano
+
+    //Comprueba si hay nuevas cartas que agregar a la mano visual
+    let arrayManoVisual = Array.prototype.slice.call(divCartas.children);
+    buclemano: for (let i = 0; i < tuMano.length; i++) {
+        for (let j = 0; j < arrayManoVisual.length; j++) {
+            let numJ = arrayManoVisual[j].dataset.numeroCarta;
+            if (numJ == tuMano[i]) {
+                //Lo siento Gerardo, pero me ahorro muchos ciclos de la CPU con esto de aquí
+                continue buclemano;
+            }
+        }
+        //Si hemos llegado aquí, es que no se ha encontrado tuMano[i] dentro de arrayManoVisual, de modo que tenemos que meterlo
+        agregarCarta(tuMano[i]);
     }
 
+    //Comprueba si hay visualmente cartas que ya no están en la mano
     divCartas.childNodes.forEach(
         function(currentValue, currentIndex, listObj) {
             let numCarta = currentValue.dataset.numeroCarta;
+
             let sinCarta = true;
             for (let i = 0; i < tuMano.length; i++) {
                 if (tuMano[i] == numCarta) {
@@ -315,7 +340,9 @@ function ponerEstado(eligeCartaAnterior) {
                     break;
                 }
             }
-            if (!sinCarta) {
+            if (sinCarta) {
+                currentValue.parentNode.removeChild(currentValue);
+            } else {
                 if (eligeCarta != eligeCartaAnterior) {
                     currentValue.classList.remove("elegible");
                     if (eligeCarta) {
@@ -327,12 +354,11 @@ function ponerEstado(eligeCartaAnterior) {
                         currentValue.parentNode.replaceChild(imgClon, currentValue);
                     }
                 }
-            } else {
-                currentValue.parentNode.removeChild(currentValue);
             }
         }
     );
 
+    //Esto clasifica con clases quién es exactamente cada jugador, es decir, cuál eres tú, quién es el cuentacuentos, etc
     let i = 0;
     divJugadores.childNodes.forEach(
         function(currentValue, currentIndex, listObj) {
