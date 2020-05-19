@@ -58,6 +58,7 @@ function enPeticionLista(saltarIndicador = false) {
             cartasVotacion = new Array();
             cartaVotada = "";
             listaFaltanVotar = new Array();
+            puntuacionRonda = -1;
             let datos = this.responseText.split(";");
             if (datos.length > 1) {
                 if (datos[1] != "null")
@@ -123,7 +124,7 @@ var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1,
     cartaVotada = 0,
     cartasVotacion = new Array(),
     cartaVotada = 'null',
-    puntuacionRonda = 0;
+    puntuacionRonda = -1;
 listaFaltan = new Array();
 
 crearEvento(window, "load", init);
@@ -286,7 +287,7 @@ function ponerEstado(eligeCartaAnterior) {
             }
     } else if (estadoJuego == "Puntuacion") {
         mensaje1.innerHTML = "Estado Puntuación";
-        if (puntuacionRonda != 0) {
+        if (puntuacionRonda != -1) {
             aceptarPuntuacion.classList.remove("quitar");
             mensaje2.innerHTML = "Has conseguido " + puntuacionRonda + " puntos esta ronda.";
         } else {
@@ -367,12 +368,17 @@ function elegirCarta(carta, indice) {
         if (pista == "null") {
             return;
         }
-        getAsync(urlGet + "?accion=elegir_carta_inicio&carta_elegida=" + carta + "" + "&pista=" + pista);
+        getAsync(urlGet + "?accion=elegir_carta_inicio&carta_elegida=" + carta + "&pista=" + pista);
     } else if (estadoJuego == "PensandoCartas") {
         getAsync(urlGet + "?accion=elegir_carta_pensando_cartas&carta_elegida=" + carta);
     } else if (estadoJuego == "PensandoCC") {
         if (cuentacuentos == jugadores[jugadorIndice].correo) {
-            getAsync(urlGet + "?accion=elegir_carta_pensando_cc&carta_elegida=" + carta);
+            while (pista == "")
+                pista = prompt("Ofrece una pista para los demás jugadores");
+            if (pista == "null") {
+                return;
+            }
+            getAsync(urlGet + "?accion=elegir_carta_pensando_cc&carta_elegida=" + carta + "&pista=" + pista);
         } else {
             console.log("Error, no se admite durante el estado " + estadoJuego);
         }
