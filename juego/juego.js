@@ -113,10 +113,11 @@ function enPeticionLista(saltarIndicador = false) {
 }
 
 async function pedirEstadoJuego() {
+    //Este método repite cada X tiempo la acción de actualizar los datos de la partida, una acción costosa que no debería realizarse con demasiada frecuencia para que cuanto más se haga mejor
     getAsync(urlGet + "?accion=get_estado_partida", true);
     setTimeout(() => {
         pedirEstadoJuego();
-    }, 2000);
+    }, 1000);
 };
 
 var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, mensajeImagen, mensajePista, divVotacion, divCartas, aceptarPuntuacion, eligeCarta, cartaElegida = 0,
@@ -144,6 +145,15 @@ function agregarCarta(carta) {
 
 function init() {
     ajaxXHR = new objetoXHR();
+
+    var musica = new Audio('media/background.ogg');
+    musica.addEventListener("canplaythrough", event => {
+        musica.play();
+    });
+    musica.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    }, false);
 
     body = document.body;
     divTusCartas = document.getElementById("tusCartas");
@@ -296,7 +306,7 @@ function ponerEstado(eligeCartaAnterior) {
                 div.appendChild(p);
             }
     } else if (estadoJuego == "Puntuacion") {
-        mensaje1.innerHTML = "Estado Puntuación";
+        mensaje1.innerHTML = "Ronda Finalizada";
         if (puntuacionRonda != -1) {
             aceptarPuntuacion.classList.remove("quitar");
             mensaje2.innerHTML = "Has conseguido " + puntuacionRonda + " puntos esta ronda.";
