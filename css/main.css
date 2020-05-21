@@ -83,6 +83,27 @@ h1 {
   padding: 10px;
 }
 
+.salas {
+  text-align: center;
+}
+.salas .cabecera {
+  font-weight: bold;
+  background-color: #DDD;
+}
+.salas .row {
+  border: 1px solid black;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  align-items: center;
+}
+.salas p {
+  margin: 0px;
+}
+.salas svg {
+  width: 25px;
+  height: 25px;
+}
+
 .comojugar .row > * {
   width: 100%;
 }

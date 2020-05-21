@@ -22,7 +22,7 @@ if (isset($_GET['accion'])){
     $bbdd = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
     if (!$bbdd){
         die('Error al conectar la base de datos');
-    } 
+    }
     $sql = 'SELECT Id, Estado, Posicion, Mano, Cuentacuentos, Pista, CartaElegida FROM partidas, partida_jugador WHERE Partida=Id AND Jugador=\''.$_SESSION['usuario_correo'].'\'';
     $resultado = $bbdd->query($sql);
 

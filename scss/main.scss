@@ -102,6 +102,27 @@ h1 {
     }
 }
 
+.salas {
+    text-align: center;
+    .cabecera {
+        font-weight: bold;
+        background-color: #DDD;
+    }
+    .row {
+        border: 1px solid black;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        align-items: center;
+    }
+    p {
+        margin: 0px;
+    }
+    svg {
+        width: 25px;
+        height: 25px;
+    }
+}
+
 .comojugar {
     .row>* {
         width: 100%;
