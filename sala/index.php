@@ -27,9 +27,9 @@ if (isset($_GET['sala'])){
     if ($resultado===false){
         echo '<h3 class="salas">Error al conectar, sentimos las molestias</h3>';
     } else if ($fila = mysqli_fetch_array($resultado)){
-        if ($fila[3]===null || isset($_GET['pista']) && $fila[3]==$_GET['contra']){
+        if ($fila[3]===null || isset($_GET['contra']) && $fila[3]==$_GET['contra']){
             //Acceso a la base de datos, INSERT
-            die("DEBUG: Has entrado en la sala enhorabuena mu bien genial :D");
+            die('DEBUG: Has entrado en la sala de '.$fila[1].' (bueno, en realidad no) enhorabuena mu bien genial :D');
             // header('Location: .');
         } else {
             echo '<h3 class="salas" style="color: red;">La contraseña es incorrecta</h3>';
@@ -59,6 +59,8 @@ if ($resultado===false || $resultado->num_rows==0){
             <div class="col-3">
             </div>
         </div>';
+    
+    //TODO: nada por GET, todo por POST
     while ($fila = mysqli_fetch_array($resultado)){
         $salas[] = array($fila[0], $fila[1], $fila[2], $fila[3]===NULL? 'false': 'true');
         echo '<div class="row">
