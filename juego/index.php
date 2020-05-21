@@ -1,7 +1,5 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-error_reporting(E_ALL);
-ini_set('display_errors', 'on');
 // Destáquese que todos los comentarios desaparecerán en las versiones de producción
 /* Estados del juego:
     "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"

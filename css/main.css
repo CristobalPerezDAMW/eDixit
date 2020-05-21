@@ -56,19 +56,26 @@ h1 {
   text-align: center;
   font-size: 1.5rem;
 }
+.indice a {
+  display: block;
+}
 .indice h2 {
   font-size: 1.2em;
+  text-decoration: underline;
 }
 .indice .salas_publicas {
   margin-bottom: 5vh;
 }
-.indice .salas_publicas button {
+.indice .salas_publicas button,
+.indice .salas_publicas a {
   background-color: #CEE;
 }
-.indice .salas_privadas button {
+.indice .salas_privadas button,
+.indice .salas_privadas a {
   background-color: #EEE;
 }
-.indice button {
+.indice button,
+.indice a {
   border: 1px thin black;
   border-radius: 5%;
   width: 100%;
