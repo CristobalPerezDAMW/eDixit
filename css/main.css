@@ -51,24 +51,45 @@ h1 {
   font-size: 1.25rem;
 }
 
+.indice {
+  min-height: 70vh;
+  text-align: center;
+  font-size: 1.5rem;
+}
+.indice h2 {
+  font-size: 1.2em;
+}
+.indice .salas_publicas {
+  margin-bottom: 5vh;
+}
+.indice .salas_publicas button {
+  background-color: #CEE;
+}
+.indice .salas_privadas button {
+  background-color: #EEE;
+}
+.indice button {
+  border: 1px thin black;
+  border-radius: 5%;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+}
+
 .comojugar .row > * {
   width: 100%;
 }
-
 .comojugar .row > div {
   margin-top: 5px;
 }
-
 .comojugar picture {
   width: 100%;
   display: block;
   text-align: center;
 }
-
 .comojugar img {
   max-width: 100%;
 }
-
 .comojugar p,
 .comojugar li {
   margin: auto;
@@ -76,19 +97,16 @@ h1 {
   font-size: 1.1rem;
   max-width: 18em;
 }
-
 .comojugar h1 {
   text-align: center;
   font-size: 1.9rem;
   margin-top: 20px;
 }
-
 .comojugar h2 {
   text-align: center;
   font-size: 1.6rem;
   margin-top: 16px;
 }
-
 .comojugar h3 {
   text-align: center;
   font-size: 1.3rem;
@@ -96,43 +114,45 @@ h1 {
 }
 
 @media screen and (min-width: 900px) {
+  .indice {
+    font-size: 1.8rem;
+  }
+
   .comojugar p,
 .comojugar li {
     font-size: 1.3rem;
   }
-
   .comojugar h1 {
     text-align: center;
     font-size: 2.1rem;
   }
-
   .comojugar h2 {
     text-align: center;
     font-size: 1.8rem;
   }
-
   .comojugar h3 {
     text-align: center;
     font-size: 1.5rem;
   }
 }
 @media screen and (min-width: 1400px) {
+  .indice {
+    font-size: 2.5rem;
+  }
+
   .comojugar p,
 .comojugar li {
     font-size: 1.5rem;
     max-width: 35em;
   }
-
   .comojugar h1 {
     text-align: center;
     font-size: 2.3rem;
   }
-
   .comojugar h2 {
     text-align: center;
     font-size: 2rem;
   }
-
   .comojugar h3 {
     text-align: center;
     font-size: 1.7rem;
