@@ -17,6 +17,29 @@ if (!$bbdd){
     die('<p style="color: red;">Error al conectar la base de datos</p>');
 }
 
+//Si el usuario ya está en una sala, no se mostrará otra cosa más que la sala
+//Aquí va acceso a la base de datos
+
+//Si se entra a la página en un intento de entrar en una sala, si no es correcto se mostrará un mensaje y luego las salas, si es correcto se agregará a la sala y se actualizará la página, mostrando la sala al estar en una
+if (isset($_GET['sala'])){
+    $sql = 'SELECT Id, Anfitrion, Descripcion, Contra FROM salas WHERE Id = '.$_GET['sala'];
+    $resultado = $bbdd->query($sql);
+    if ($resultado===false){
+        echo '<h3 class="salas">Error al conectar, sentimos las molestias</h3>';
+    } else if ($fila = mysqli_fetch_array($resultado)){
+        if ($fila[3]===null || isset($_GET['pista']) && $fila[3]==$_GET['contra']){
+            //Acceso a la base de datos, INSERT
+            die("DEBUG: Has entrado en la sala enhorabuena mu bien genial :D");
+            // header('Location: .');
+        } else {
+            echo '<h3 class="salas" style="color: red;">La contraseña es incorrecta</h3>';
+        }
+    } else {
+        echo '<h3 class="salas">Esta sala ya no existe</h3>';
+    }
+
+}
+
 $sql = 'SELECT Id, Anfitrion, Descripcion, Contra FROM salas';
 $resultado = $bbdd->query($sql);
 if ($resultado===false || $resultado->num_rows==0){
@@ -102,6 +125,7 @@ if (isset($_SESSION['iniciada'])){
         }
     </script>';
 }
+
 echo '<!-- Iconos de sala con y sin contraseña - https://fontawesome.com/license-->';
 ?>
 
