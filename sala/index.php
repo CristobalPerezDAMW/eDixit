@@ -22,12 +22,12 @@ if (!$bbdd){
 
 //Si se entra a la página en un intento de entrar en una sala, si no es correcto se mostrará un mensaje y luego las salas, si es correcto se agregará a la sala y se actualizará la página, mostrando la sala al estar en una
 if (isset($_GET['sala'])){
-    $sql = 'SELECT Id, Anfitrion, Descripcion, Contra FROM salas WHERE Id = '.$_GET['sala'];
+    $sql = 'SELECT `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra` FROM `salas` WHERE `Id` = '.$_GET['sala'];
     $resultado = $bbdd->query($sql);
     if ($resultado===false){
         echo '<h3 class="salas">Error al conectar, sentimos las molestias</h3>';
     } else if ($fila = mysqli_fetch_array($resultado)){
-        if ($fila[3]===null || isset($_GET['contra']) && $fila[3]==$_GET['contra']){
+        if ($fila[4]===null || isset($_GET['contra']) && $fila[4]==$_GET['contra']){
             //Acceso a la base de datos, INSERT
             die('DEBUG: Has entrado en la sala de '.$fila[1].' (bueno, en realidad no) enhorabuena mu bien genial :D');
             // header('Location: .');
@@ -40,42 +40,52 @@ if (isset($_GET['sala'])){
 
 }
 
-$sql = 'SELECT Id, Anfitrion, Descripcion, Contra FROM salas';
+// $sql = 'SELECT Id, Anfitrion, Descripcion, Maximo, Contra FROM salas';
+// $sql = 'SELECT `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra`, count(`sala_jugador`.Jugador) FROM `salas`, `sala_jugador` WHERE `Sala` = `Id` GROUP BY `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra`';
+$sql = 'SELECT `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra`, count(`sala_jugador`.Jugador) FROM `salas` LEFT OUTER JOIN `sala_jugador` ON `Sala` = `Id` GROUP BY `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra`';
+// die($sql);
 $resultado = $bbdd->query($sql);
 if ($resultado===false || $resultado->num_rows==0){
-    // $salas = false;
     echo '<h3 class="salas">No hay salas, pero tú puedes <a href="crear">crear una sala</a>.</h3>';
 } else {
     echo '<div class="container salas">
         <div class="row cabecera">
-            <div class="col-1">
+            <div class="col-md-1 col-6">
             </div>
-            <div class="col-4">
+            <div class="col-md-3 col-6">
                 Anfitrión
             </div>
-            <div class="col-4">
+            <div class="col-md-3 col-6">
                 Mensaje
             </div>
-            <div class="col-3">
+            <div class="col-md-2 col-6">
+                Participantes
+            </div>
+            <div class="col-md-3 d-md-block d-none">
             </div>
         </div>';
     
     //TODO: nada por GET, todo por POST
     while ($fila = mysqli_fetch_array($resultado)){
-        $salas[] = array($fila[0], $fila[1], $fila[2], $fila[3]===NULL? 'false': 'true');
+        // `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra`, count(`sala_jugador`.Jugador)
+        $salas[] = array($fila[0], $fila[1], $fila[2], $fila[3], $fila[4]===NULL? 'false': 'true');
+        // echo '<!-- '.var_export($salas, true).' -->';
         echo '<div class="row">
-            <div class="col-1">'.
-                ($fila[3]===null 
+            <div class="col-md-1 col-6">'.
+                ($fila[4]===null 
                 ?'<svg title="Sin Contraseña" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="lock-open" class="svg-inline--fa fa-lock-open fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="#ba9c4a" d="M423.5 0C339.5.3 272 69.5 272 153.5V224H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48h-48v-71.1c0-39.6 31.7-72.5 71.3-72.9 40-.4 72.7 32.1 72.7 72v80c0 13.3 10.7 24 24 24h32c13.3 0 24-10.7 24-24v-80C576 68 507.5-.3 423.5 0z"></path></svg>'
                 :'<svg title="Con Contraseña" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="lock" class="svg-inline--fa fa-lock fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#ba9c4a" d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"></path></svg>')
             .'</div>
-            <div class="col-4">
+            <div class="col-md-3 col-6">
                 <p>'.$fila[1].'</p>
             </div>
-            <div class="col-4">
+            <div class="col-md-3 col-6">
                 <p>'.$fila[2].'</p>
             </div>
-            <div class="col-3">
+            <div class="col-md-2 col-6">
+                <p>'.$fila[5].'/'.$fila[3].'</p>
+            </div>
+            <div class="col-md-3">
                 <button id="btn-'.$fila[0].'" '.(isset($_SESSION['iniciada'])?'':'disabled').'>Unirse</button>
             </div>
         </div>';
@@ -85,7 +95,7 @@ if ($resultado===false || $resultado->num_rows==0){
 
 $bbdd->close();
 
-if (isset($_SESSION['iniciada'])){
+if (isset($_SESSION['iniciada']) && isset($salas)){
     echo '<script>
         var crearEvento = (function() {
             function w3c_crearEvento(elemento, evento, mifuncion) {
@@ -106,7 +116,7 @@ if (isset($_SESSION['iniciada'])){
         })();
         var salas = [';
         foreach ($salas as $sala){
-            echo '["'.$sala[0].'", document.getElementById("btn-'.$sala[0].'"), "'.$sala[1].'", "'.$sala[2].'", "'.$sala[3].'"], ';
+            echo '["'.$sala[0].'", document.getElementById("btn-'.$sala[0].'"), "'.$sala[1].'", "'.$sala[2].'", "'.$sala[4].'"], ';
         }
         echo '];
         

@@ -103,6 +103,9 @@ h1 {
   width: 25px;
   height: 25px;
 }
+.salas button {
+  width: 100%;
+}
 
 .comojugar .row > * {
   width: 100%;
