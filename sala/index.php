@@ -20,12 +20,57 @@ if (isset($_GET['accion'])){
             // die($sql);
             $resultado = $bbdd->query($sql);
             if ($resultado===false){
-                die('Error: '.$bbdd->errno());
+                die('Error: '.$bbdd->errno);
             }
+            $todos = true;
             while ($fila = mysqli_fetch_array($resultado)){
-                $participantes .= $fila[0].':'.$fila[1];
+                $participantes[] = $fila[0].':'.$fila[1];
+                if ($fila[1]!=1){
+                    $todos = false;
+                }
             }
-        die(join(';', $participantes));
+            if ($todos){
+                die('Empezar');
+            }
+            die(join(';', $participantes));
+
+            case 'estoy_listo':
+                if (!isset($_GET['sala'])){
+                    die('Error: Información incompleta');
+                }
+                $sql = 'SELECT `Jugador`, `Listo` FROM `sala_jugador` WHERE `Sala`=\''.$_GET['sala'].'\' AND `Listo`=\'0\'';
+                $resultado = $bbdd->query($sql);
+                if ($resultado===false){
+                    die('Error: Error al acceder a la base de datos');
+                }
+                $cont = 0;
+                while($fila = mysqli_fetch_array($resultado)){
+                    $cont++;
+                }
+                //Si falta 1 y es el que va a estar listo ahora, empieza el juego
+                if ($cont==1){
+                    if ($fila[0]==$_SESSION['usuario_correo']){
+                        //Vamos a preparar la partida, necesitamos generar primero las manos de los jugadores y también guardar las cartas sobrantes. Lo haremos a partir del número de cartas (Y), sabiendo que existen todas las cartas del formato carta(X).jpg donde X es un número entero dentro de [1, Y]
+                        //Paso 1: generamos el array de números y lo barajamos
+                        $max = 30;
+                        for ($i=1; $i <= $max; $i++) { 
+                            $cartas[] = $i; 
+                        }
+                        shuffle($cartas);
+                        //Paso 2: Seleccionamos 6 cartas para cada jugador
+
+                        // $mysqli->begin_transaction();
+                        // $mysqli->query('DELETE FROM `salas` WHERE `Id`='.$_GET['sala']);
+                        // $mysqli->query('INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Posicion`, `Mano`, `CartaElegida`, `CartaVotada`, `PuntuacionRonda`) 
+                        // VALUES ([value-1],[value-2],[value-3],[value-4],[value-5],[value-6],[value-7])');
+                        // $mysqli->commit();
+                    }
+                }
+
+                $sql = 'UPDATE `sala_jugador` SET `Listo`=\'1\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
+                $bbdd->query($sql);
+
+                die('Listo');
     }
     die();
 }
@@ -33,7 +78,6 @@ if (isset($_GET['accion'])){
 $ruta='..';
 $pag = 'Salas Públicas';
 require("../cabecera.php");
-
 
 if (!isset($_SESSION['iniciada'])){
     echo '<h3 class="salas mb-4">Recuerda que debes <a href="../login">iniciar sesión</a> para poder unirte a una sala</h3>';
@@ -76,6 +120,9 @@ if (!isset($_SESSION['iniciada'])){
         $resultado = $bbdd->query($sql);
         while ($fila = mysqli_fetch_array($resultado)){
             $participantes[] = array($fila[0], $fila[1]);
+            if ($fila[0]==$_SESSION['usuario_correo']){
+                $listo = $fila[1];
+            }
         }
         echo '<div class="container sala" id="containerSala">
             <div class="row cabecera">
@@ -102,6 +149,15 @@ if (!isset($_SESSION['iniciada'])){
         }
         echo '</div>
         </div>';
+        if ($listo==0){
+            echo '<div class="container" id="containerListo">
+                <div class="row">
+                    <div class="col-12">
+                        <button id="btnListo">Estoy Preparado</button>
+                    </div>
+                </div>
+            </div>';
+        }
         ?>
         <script>
         //Necesario para ir actualizando los datos de la sala
@@ -109,6 +165,25 @@ if (!isset($_SESSION['iniciada'])){
         var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
         var ajaxXHR;
         var containerSala = document.getElementById("containerSala");
+        var btnReady = document.getElementById("btnListo");
+
+        var crearEvento = (function() {
+            function w3c_crearEvento(elemento, evento, mifuncion) {
+                elemento.addEventListener(evento, mifuncion, false);
+            }
+
+            function ie_crearEvento(elemento, evento, mifuncion) {
+                var fx = function() {
+                    mifuncion.call(elemento);
+                };
+                elemento.attachEvent("on" + evento, fx);
+            }
+            if (typeof window.addEventListener !== "undefined") {
+                return w3c_crearEvento;
+            } else if (typeof window.attachEvent !== "undefined") {
+                return ie_crearEvento;
+            }
+        })();
 
         function objetoXHR() {
             if (window.XMLHttpRequest) {
@@ -140,9 +215,12 @@ if (!isset($_SESSION['iniciada'])){
 
         function enPeticionLista() {
             if (this.readyState == 4 && this.status == 200) {
-                    console.log(this.responseText); 
                 if (this.responseText.startsWith('Error') !== false) {
-                    console.log(this.responseText); 
+                    console.log(this.responseText);
+                } else if (this.responseText == 'Empezar') {
+                    window.location.href = '../juego';
+                } else if (this.responseText == 'Listo') {
+                    btnListo.parentNode.removeChild(btnListo);
                 } else {
                     let participantes = this.responseText.split(";");
                     
@@ -193,6 +271,11 @@ if (!isset($_SESSION['iniciada'])){
 
         function init(){
             ajaxXHR = new objetoXHR();
+            if (btnListo != null){
+                crearEvento(btnListo, "click", function() {
+                    getAsync(urlGet+"?accion=estoy_listo&sala="+sala);
+                });
+            } 
             pedirEstadoSala();
         }
         </script>
@@ -300,18 +383,6 @@ if (isset($_SESSION['iniciada']) && isset($salas)){
                 }
                 return true;
             });
-            // crearEvento(salas[i][1], "click", function(evento){
-            //     let sala = salas[evento.target.dataset.indice];
-            //     if (sala[4]=="true"){
-            //         let contra = prompt("Introduce la contraseña de la sala");
-            //         if (contra==""){
-            //             alert("Debes introducir la contraseña para entrar en esta sala");
-            //         } else if (contra!=null)
-            //             window.location.href = encodeURI("?sala="+sala[0]+"&contra="+contra);
-            //     } else {
-            //         window.location.href = "?sala="+sala[0];
-            //     }
-            // });
         }
     </script>';
 }

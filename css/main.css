@@ -136,6 +136,14 @@ h1 {
   height: 25px;
 }
 
+#containerListo {
+  margin-top: 10vh;
+}
+#containerListo button {
+  font-size: 3rem;
+  width: 100%;
+}
+
 .comojugar .row > * {
   width: 100%;
 }
