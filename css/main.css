@@ -107,6 +107,35 @@ h1 {
   width: 100%;
 }
 
+.sala {
+  border: 1px solid black;
+  text-align: center;
+  font-size: 1rem;
+}
+.sala .row {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  align-items: center;
+}
+.sala .subcabecera {
+  font-size: 1.3em;
+}
+.sala .cabecera {
+  font-size: 2.5em;
+  font-weight: bold;
+  background-color: #DDD;
+}
+.sala .jugador {
+  font-size: 1em;
+}
+.sala p {
+  margin: 0px;
+}
+.sala svg {
+  width: 25px;
+  height: 25px;
+}
+
 .comojugar .row > * {
   width: 100%;
 }
@@ -165,6 +194,10 @@ h1 {
     text-align: center;
     font-size: 1.5rem;
   }
+
+  .sala {
+    font-size: 1.5rem;
+  }
 }
 @media screen and (min-width: 1400px) {
   .indice {
@@ -187,6 +220,10 @@ h1 {
   .comojugar h3 {
     text-align: center;
     font-size: 1.7rem;
+  }
+
+  .sala {
+    font-size: 2rem;
   }
 }
 /*!
