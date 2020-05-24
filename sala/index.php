@@ -38,39 +38,64 @@ if (isset($_GET['accion'])){
                 if (!isset($_GET['sala'])){
                     die('Error: Información incompleta');
                 }
-                $sql = 'SELECT `Jugador`, `Listo` FROM `sala_jugador` WHERE `Sala`=\''.$_GET['sala'].'\' AND `Listo`=\'0\'';
+                $return = 'Listo';
+                $sql = 'SELECT `Jugador`, `Listo` FROM `sala_jugador` WHERE `Sala`=\''.$_GET['sala'].'\'';
                 $resultado = $bbdd->query($sql);
                 if ($resultado===false){
                     die('Error: Error al acceder a la base de datos');
                 }
                 $cont = 0;
                 while($fila = mysqli_fetch_array($resultado)){
-                    $cont++;
+                    if ($fila[1]==0){
+                        $cont++;
+                    }
+                    $jugadores[] = array($fila[0], '');
                 }
                 //Si falta 1 y es el que va a estar listo ahora, empieza el juego
                 if ($cont==1){
                     if ($fila[0]==$_SESSION['usuario_correo']){
                         //Vamos a preparar la partida, necesitamos generar primero las manos de los jugadores y también guardar las cartas sobrantes. Lo haremos a partir del número de cartas (Y), sabiendo que existen todas las cartas del formato carta(X).jpg donde X es un número entero dentro de [1, Y]
+                        //(El máximo hay que modificarlo si se agregan o quitan cartas)
+                        //Pasos a seguir:
                         //Paso 1: generamos el array de números y lo barajamos
-                        $max = 30;
+                        //Paso 4: Creamos la partida
+                        $max = 50;
                         for ($i=1; $i <= $max; $i++) { 
                             $cartas[] = $i; 
                         }
                         shuffle($cartas);
-                        //Paso 2: Seleccionamos 6 cartas para cada jugador
+                        //Paso 2: Damos 6 cartas a cada jugador
+                        if (count($jugadores)*6 < $max){
+                            die('Error: No hay cartas para tantos jugadores');
+                        }
+                        foreach($jugadores as $j){
+                            $j[1] = array_shift($cartas).';'.array_shift($cartas).';'.array_shift($cartas).';'.array_shift($cartas).';'.array_shift($cartas).';'.array_shift($cartas);
+                        }
+                        $bbdd->begin_transaction();
 
-                        // $mysqli->begin_transaction();
-                        // $mysqli->query('DELETE FROM `salas` WHERE `Id`='.$_GET['sala']);
-                        // $mysqli->query('INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Posicion`, `Mano`, `CartaElegida`, `CartaVotada`, `PuntuacionRonda`) 
-                        // VALUES ([value-1],[value-2],[value-3],[value-4],[value-5],[value-6],[value-7])');
-                        // $mysqli->commit();
+                        $log = 'INSERT INTO `partidas`(`Id`, `CartasPila`)
+                        VALUES (\''.$_GET['sala'].'\', \''.join(';', $cartas).'\')';
+
+                        $bbdd->query('INSERT INTO `partidas`(`Id`, `CartasPila`)
+                        VALUES (\''.$_GET['sala'].'\', \''.join(';', $cartas).'\')');
+                        foreach($jugadores as $j){
+                            $mysqli->query('INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Mano`)
+                            VALUES (\''.$_GET['sala'].'\', \''.$j[0].'\', \''.join(';', $j[1]).'\')');
+
+                            $log.="\n".'INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Mano`)
+                            VALUES (\''.$_GET['sala'].'\', \''.$j[0].'\', \''.join(';', $j[1]).'\')';
+                        }
+                        $bbdd->commit();
+                        $log.="\n".$bbdd->errno;
+                        file_put_contents('log.txt', $log);
+                        $return = 'Empezar';
                     }
                 }
 
                 $sql = 'UPDATE `sala_jugador` SET `Listo`=\'1\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
                 $bbdd->query($sql);
 
-                die('Listo');
+                die($return);
     }
     die();
 }
