@@ -44,10 +44,13 @@ if (isset($_GET['accion'])){
                 $faltan_elegir[] = $fila[0];
             }
         }
-        $sql = 'SELECT `Jugador`, `Posicion` FROM `partida_jugador` WHERE `Id`=\''.$id_partida.'\'';
+        $sql = 'SELECT `Jugador`, `Posicion` FROM `partida_jugador` WHERE `Partida`=\''.$id_partida.'\'';
         $resultado = $bbdd->query($sql);
         while ($fila = mysqli_fetch_array($resultado)){
             $posiciones[] = $fila[0].':'.$fila[1];
+            if ($fila[1]>=30){
+                $estado = 'Final';
+            }
         }
 
         if ($estado=='Votacion'){
@@ -87,8 +90,8 @@ if (isset($_GET['accion'])){
             $bbdd->close();
             die($estado.';'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';'.$carta_elegida.';'.implode(',', $faltan_elegir).
             (isset($cartas_votacion) ? ';'.implode(',',$cartas_votacion) .';'.$carta_votada.';'.implode(',',$faltan_votar) : ';;null;').
-            (isset($puntuacion_ronda) ? ';'.$puntuacion_ronda : 'null').
-            implode(',', $posiciones)
+            (isset($puntuacion_ronda) ? ';'.$puntuacion_ronda : ';null').
+            ';'.implode(',', $posiciones)
             );
             break;
 
@@ -397,7 +400,8 @@ foreach ($jugadores as $correo => $jugador) {
     echo '{
         nombre: "'.$jugador['Nombre'].'",
         correo: "'.$correo.'",
-        img: "'.$jugador['Foto'].'"
+        img: "'.$jugador['Foto'].'",
+        posicion: "'.$jugador['Posicion'].'"
     }, ';
 }
 ?>

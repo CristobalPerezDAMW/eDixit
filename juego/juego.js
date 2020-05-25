@@ -38,16 +38,20 @@ function objetoXHR() {
     throw new Error("No se pudo crear el objeto XMLHttpRequest");
 }
 
-function getAsync(url, saltarIndicador = false) {
+function getAsync(url) {
     if (ajaxXHR) {
         // document.getElementById("indicadorAJAX").innerHTML = "<img src='imgs/ajax-loading.gif'/>";
         ajaxXHR.open('GET', encodeURI(url), true);
         ajaxXHR.onreadystatechange = enPeticionLista;
-        ajaxXHR.send(null);
+        try {
+            ajaxXHR.send(null);
+        } catch (e) {
+            console.log("Error al cargar: " + e);
+        }
     }
 }
 
-function enPeticionLista(saltarIndicador = false) {
+function enPeticionLista() {
     if (this.readyState == 4 && this.status == 200) {
         // document.getElementByI("indicadorAJAX").innerHTML = "";
         if (this.responseText.startsWith('Error') !== false) {
@@ -95,6 +99,16 @@ function enPeticionLista(saltarIndicador = false) {
                                             if (datos.length > 9) {
                                                 if (datos[9] != "null")
                                                     puntuacionRonda = datos[9];
+
+                                                if (datos.length > 10) {
+                                                    if (datos[10] != "null") {
+                                                        let datosJugs = datos[10].split(',');
+                                                        posicionJugadores = new Array(datosJugs.length);
+                                                        for (let i = 0; i < datosJugs.length; i++) {
+                                                            posicionJugadores[i] = datosJugs[i].split(':');
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -109,6 +123,8 @@ function enPeticionLista(saltarIndicador = false) {
             }
             ponerEstado(eligeCarta);
         }
+    } else if (this.status != 200 && this.status != 0) {
+        alert("Ha habido un error con la comunicación con el servidor.\nPor favor, recarga la página si sigue experimentando problemas.\n" + this.status);
     }
 }
 
@@ -125,8 +141,9 @@ var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1,
     cartaVotada = 0,
     cartasVotacion = new Array(),
     cartaVotada = 'null',
-    puntuacionRonda = -1;
-listaFaltan = new Array();
+    puntuacionRonda = -1,
+    posicionJugadores = new Array(),
+    listaFaltan = new Array();
 
 crearEvento(window, "load", init);
 
@@ -146,15 +163,6 @@ function agregarCarta(carta) {
 function init() {
     ajaxXHR = new objetoXHR();
 
-    var musica = new Audio('media/background.ogg');
-    musica.addEventListener("canplaythrough", event => {
-        musica.play();
-    });
-    musica.addEventListener('ended', function() {
-        this.currentTime = 0;
-        this.play();
-    }, false);
-
     body = document.body;
     divTusCartas = document.getElementById("tusCartas");
     divJugadores = document.getElementById("jugadores");
@@ -168,12 +176,20 @@ function init() {
     aceptarPuntuacion = document.getElementById("aceptarPuntuacion");
 
     jugadores.forEach(jugador => {
+        let div = document.createElement("div");
+
         let src = jugador.img;
         jugador.img = new Image();
         jugador.img.src = src;
         jugador.img.title = jugador.nombre + " (" + jugador.correo + ")";
 
-        divJugadores.appendChild(jugador.img);
+        let posicion = jugador.posicion;
+        jugador.posicion = document.createElement("p");
+        jugador.posicion.innerHTML = "Puntos: " + posicion;
+
+        div.appendChild(jugador.img);
+        div.appendChild(jugador.posicion);
+        divJugadores.appendChild(div);
     });
 
     function foreachMano(item, index) {
@@ -189,6 +205,16 @@ function init() {
     });
 
     pedirEstadoJuego();
+
+    var musica = new Audio('media/background.ogg');
+    musica.autoplay = true;
+    musica.addEventListener("canplaythrough", event => {
+        musica.play();
+    });
+    musica.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    }, false);
 }
 
 function ponerEstado(eligeCartaAnterior) {
@@ -291,6 +317,9 @@ function ponerEstado(eligeCartaAnterior) {
                     crearEvento(div, "click", function(event) {
                         // alert(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
                         getAsync(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
+                        while (divVotacion.firstChild) {
+                            divVotacion.removeChild(divVotacion.lastChild);
+                        }
                     });
                 }
 
@@ -313,12 +342,14 @@ function ponerEstado(eligeCartaAnterior) {
         } else {
             mensaje2.innerHTML = "Esperando a que todos acepten para empezar la siguiente ronda.";
         }
+    } else if (estadoJuego == "Final") {
+        divCartas.classList.add("quitar");
+        mensaje1.innerHTML = "Fin del juego";
+        mensaje2.innerHTML = "Ganadores: ";
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
-        // divMensajes.classList.add("quitar");
         mensaje1.innerHTML = "Error: El estado no existe";
-        // mensaje2.innerHTML = "Lo sentimos mucho, algo no está del todo pulido por aquí detras.";
-        mensaje2.innerHTML = "¿Qué esperabas? El juego no está terminado, pero gracias por intentarlo.";
+        mensaje2.innerHTML = "Quizás ha habido una actualización o un error en el servidor";
         return;
     }
 
@@ -356,7 +387,10 @@ function ponerEstado(eligeCartaAnterior) {
                 if (eligeCarta != eligeCartaAnterior) {
                     currentValue.classList.remove("elegible");
                     if (eligeCarta) {
-                        crearEvento(currentValue, "click", function() { elegirCarta(numCarta, currentIndex) });
+                        crearEvento(currentValue, "click", function(event) {
+                            event.preventDefault();
+                            elegirCarta(numCarta, currentIndex)
+                        });
                         currentValue.classList.add("elegible");
                     } else {
                         let imgClon = currentValue.cloneNode(true);
@@ -384,12 +418,15 @@ function ponerEstado(eligeCartaAnterior) {
                     currentValue.classList.remove("cuentacuentos");
                     currentValue.title = jugadores[i].nombre + " (" + jugadores[i].correo + ")";
                 }
-                for (let j = 0; j < listaFaltan.length; j++) {
-                    if (jugadores[i].correo == listaFaltan[j]) {
-                        currentValue.classList.add("eligiendo");
-                        currentValue.title += " (Está eligiendo carta)";
-                    }
+                if (typeof posicionJugadores != "undefined" && typeof posicionJugadores[i] != "undefined") {
+                    jugadores[i].posicion.innerHTML = "Puntos: " + posicionJugadores[i][1];
                 }
+                // for (let j = 0; j < listaFaltan.length; j++) {
+                //     if (jugadores[i].correo == listaFaltan[j]) {
+                //         currentValue.classList.add("eligiendo");
+                //         currentValue.title += " (Está eligiendo carta)";
+                //     }
+                // }
                 i++;
             }
         }
@@ -406,6 +443,7 @@ function elegirCarta(carta, indice) {
         }
         getAsync(urlGet + "?accion=elegir_carta_inicio&carta_elegida=" + carta + "&pista=" + pista);
     } else if (estadoJuego == "PensandoCartas") {
+        cartaElegida = carta;
         getAsync(urlGet + "?accion=elegir_carta_pensando_cartas&carta_elegida=" + carta);
     } else if (estadoJuego == "PensandoCC") {
         if (cuentacuentos == jugadores[jugadorIndice].correo) {

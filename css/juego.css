@@ -34,7 +34,12 @@ body {
   margin-bottom: 10px;
   min-height: min-content;
 }
-
+#jugadores div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 #jugadores img {
   width: 10vh;
   height: 10vh;
@@ -49,12 +54,23 @@ body {
   padding: 2px;
   overflow-x: auto;
 }
-
-#jugadores img.tuPerfil {
+#jugadores p {
+  border-radius: 10%;
+  text-align: center;
+  font-size: 1.5rem;
+  margin: 0;
+  padding: 3px;
+  background: white;
+  color: black;
+}
+#jugadores .tuPerfil img {
   border: 2px solid blue;
 }
-
-#jugadores img.cuentacuentos {
+#jugadores .tuPerfil p {
+  background: blue;
+  color: white;
+}
+#jugadores .cuentacuentos img {
   box-shadow: 0 0 0 10px #C0A, 0 0 0 15px #E0C;
 }
 

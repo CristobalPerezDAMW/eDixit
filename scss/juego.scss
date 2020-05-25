@@ -37,37 +37,52 @@ body {
     margin-top: 10px;
     margin-bottom: 10px;
     min-height: min-content;
-}
-
-#jugadores img {
-    @include imagen_perfil(10vh);
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    border-radius: 50%;
-    border: 1px solid black;
-    // margin: 3px;
-    margin-left: 5px;
-    margin-bottom: 5px;
-    padding: 2px;
-    overflow-x: auto;
-}
-
-#jugadores img.tuPerfil {
-    border: 2px solid blue;
-    // outline: 1px solid black;
-}
-
-#jugadores img.cuentacuentos {
-    // outline: 1px solid blue;
-    // background-clip: border-box;
-    // background-color: yellow;
-    box-shadow: 0 0 0 10px #C0A, 0 0 0 15px #E0C;
-}
-
-#jugadores img.eligiendo {
-    // box-shadow: 0 0 0 7px #CCA, 0 0 0 12px #EEC;
-    // background-color: yellow;
+    div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    img {
+        @include imagen_perfil(10vh);
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        border-radius: 50%;
+        border: 1px solid black;
+        // margin: 3px;
+        margin-left: 5px;
+        margin-bottom: 5px;
+        padding: 2px;
+        overflow-x: auto;
+    }
+    p {
+        border-radius: 10%;
+        text-align: center;
+        font-size: 1.5rem;
+        margin: 0;
+        padding: 3px;
+        background: white;
+        color: black;
+    }
+    .tuPerfil {
+        img {
+            border: 2px solid blue;
+            // outline: 1px solid black;
+        }
+        p {
+            background: blue;
+            color: white;
+        }
+    }
+    .cuentacuentos {
+        img {
+            // outline: 1px solid blue;
+            // background-clip: border-box;
+            // background-color: yellow;
+            box-shadow: 0 0 0 10px #C0A, 0 0 0 15px #E0C;
+        }
+    }
 }
 
 #tusCartas {
