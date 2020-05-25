@@ -140,6 +140,7 @@ if (!isset($_SESSION['iniciada'])){
         $sql = 'SELECT `Jugador`, `Listo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND `Anfitrion`=\''.$host.'\'';
         // die($sql);
         $resultado = $bbdd->query($sql);
+        $listo = 1;
         while ($fila = mysqli_fetch_array($resultado)){
             $participantes[] = array($fila[0], $fila[1]);
             if ($fila[0]==$_SESSION['usuario_correo']){

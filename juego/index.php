@@ -126,6 +126,23 @@ if (isset($_GET['accion'])){
                     break;
                 }
             }
+            
+            $sql = 'SELECT `CartasPila`, `CartasDescartadas` FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
+            $resultado = $bbdd->query($sql);
+            if ($fila = mysqli_fetch_array($resultado)){
+                $pilaCartas = $fila[0];
+                $pilaDescartes = $fila[1];
+            }
+            if ($pilaDescartes==''){
+                $pilaDescartes = $pilaCartas;
+                $pilaCartas = '';
+            } else {
+                $pilaDescartes.=':'.$_GET['carta_elegida'];
+            }
+            
+            $sql = 'UPDATE `partidas` SET `CartasPila` = \''.$pilaCartas.'\', `CartasDescartadas`=\''.$pilaDescartes.'\' WHERE `Id`=\''.$id_partida.'\'';
+            $resultado = $bbdd->query($sql);
+
             die('PensandoCartas;'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';null;'.implode(',', $faltan_elegir));
             break;
 
@@ -216,19 +233,22 @@ if (isset($_GET['accion'])){
                     }
 
                     /*
-                    admin - Elegida: 3, Votada: NULL, Puntuación deseada: 3
-                    cris - Elegida: 10, Votada: 3, Puntuación deseada: 3
-                    usuario - Elegida: 13, Votada: 10, Puntuación deseada: 0
+                    admin(cuentacuentos) - Elegida: 3, Votada: NULL, Puntuación deseada: 3
+                    cris - Elegida: 10, Votada: 13, Puntuación deseada: 0
+                    usuario - Elegida: 13, Votada: 3, Puntuación deseada: 3+1
                     */
 
                     //Bueno, bueno. El algoritmo para los puntos. El resumen es que los reparte como dicen las normas del juego, para lo que hacen falta muchos bucles.
                     $x3Acierto = false;
                     $x3Fallo = false;
+                    $log = '';
                     foreach ($jugadores as $jugador => $datos) {
                         foreach ($jugadores as $jJ => $dJ) {
                             if ($jJ != $cuentacuentos){
                                 if ($dJ[1] == $datos[0]) {
                                     $datos[2]++;
+                                } else {
+                                    $log.="\n$dJ[1] != $datos[0] comparando $jJ con $jugador";
                                 }
                             }
                             
@@ -239,6 +259,7 @@ if (isset($_GET['accion'])){
                             $x3Fallo = true;
                         }
                     }
+                    $log.="\n".var_export($jugadores, true);
                     foreach ($jugadores as $jugador => $datos) {
                         if ($x3Acierto===true && $x3Fallo===true) {
                             if ($jugador==$cuentacuentos || $datos[1] == $jugadores[$cuentacuentos][0]) {
@@ -250,7 +271,9 @@ if (isset($_GET['accion'])){
                         $sql = 'UPDATE `partida_jugador` SET `PuntuacionRonda`=\''.$datos[2].'\' WHERE `Jugador`=\''.$jugador.'\' AND `Partida`=\''.$id_partida.'\'';
                         $bbdd->query($sql);
                     }
+                    $log.="\n".var_export($jugadores, true);
 
+                    file_put_contents('log.txt', $log);
                     $bbdd->close();
                     die('Puntuacion;null;null;null;null;null;;;;'.$jugadores[$_SESSION['usuario_correo']][2]);
                 } else {
