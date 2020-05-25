@@ -133,7 +133,7 @@ crearEvento(window, "load", init);
 function agregarCarta(carta) {
     img = new Image();
     img.src = "cartas/carta" + carta + ".jpg";
-    img.title = "Cata " + carta;
+    img.title = "Carta " + carta;
     img.dataset.numeroCarta = carta;
     img.classList.remove("elegible");
     if (eligeCarta) {

@@ -39,7 +39,7 @@ if (isset($_GET['accion'])){
                     die('Error: Información incompleta');
                 }
                 $return = 'Listo';
-                $sql = 'SELECT `Jugador`, `Listo` FROM `sala_jugador` WHERE `Sala`=\''.$_GET['sala'].'\'';
+                $sql = 'SELECT `Jugador`, `Listo`, `Anfitrion` FROM `sala_jugador`, `salas` WHERE `Id`=`Sala` AND `Sala`=\''.$_GET['sala'].'\'';
                 $resultado = $bbdd->query($sql);
                 if ($resultado===false){
                     die('Error: Error al acceder a la base de datos');
@@ -48,12 +48,17 @@ if (isset($_GET['accion'])){
                 while($fila = mysqli_fetch_array($resultado)){
                     if ($fila[1]==0){
                         $cont++;
+                        $jugador_falta = $fila[0];
                     }
                     $jugadores[] = array($fila[0], '');
+                    $host = $fila[2];
                 }
+                $jugadores[] = array($host, '');
+                var_export($jugadores);
                 //Si falta 1 y es el que va a estar listo ahora, empieza el juego
                 if ($cont==1){
-                    if ($fila[0]==$_SESSION['usuario_correo']){
+                    if ($jugador_falta==$_SESSION['usuario_correo']){
+                        $resultado = $bbdd->query($sql);
                         //Vamos a preparar la partida, necesitamos generar primero las manos de los jugadores y también guardar las cartas sobrantes. Lo haremos a partir del número de cartas (Y), sabiendo que existen todas las cartas del formato carta(X).jpg donde X es un número entero dentro de [1, Y]
                         //(El máximo hay que modificarlo si se agregan o quitan cartas)
                         //Pasos a seguir:
@@ -65,29 +70,21 @@ if (isset($_GET['accion'])){
                         }
                         shuffle($cartas);
                         //Paso 2: Damos 6 cartas a cada jugador
-                        if (count($jugadores)*6 < $max){
-                            die('Error: No hay cartas para tantos jugadores');
+                        if (count($jugadores)*6 >= $max){
+                            die('Error: No hay cartas para tantos jugadores ('.(count($jugadores)*6).' >= '.$max.')');
                         }
-                        foreach($jugadores as $j){
-                            $j[1] = array_shift($cartas).';'.array_shift($cartas).';'.array_shift($cartas).';'.array_shift($cartas).';'.array_shift($cartas).';'.array_shift($cartas);
+                        for($i=0; $i<count($jugadores); $i++){
+                            $jugadores[$i][1] = array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas);
                         }
                         $bbdd->begin_transaction();
 
-                        $log = 'INSERT INTO `partidas`(`Id`, `CartasPila`)
-                        VALUES (\''.$_GET['sala'].'\', \''.join(';', $cartas).'\')';
-
                         $bbdd->query('INSERT INTO `partidas`(`Id`, `CartasPila`)
-                        VALUES (\''.$_GET['sala'].'\', \''.join(';', $cartas).'\')');
+                        VALUES (\''.$_GET['sala'].'\', \''.join(':', $cartas).'\')');
                         foreach($jugadores as $j){
-                            $mysqli->query('INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Mano`)
-                            VALUES (\''.$_GET['sala'].'\', \''.$j[0].'\', \''.join(';', $j[1]).'\')');
-
-                            $log.="\n".'INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Mano`)
-                            VALUES (\''.$_GET['sala'].'\', \''.$j[0].'\', \''.join(';', $j[1]).'\')';
+                            $bbdd->query('INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Mano`)
+                            VALUES (\''.$_GET['sala'].'\', \''.$j[0].'\', \''.$j[1].'\')');
                         }
                         $bbdd->commit();
-                        $log.="\n".$bbdd->errno;
-                        file_put_contents('log.txt', $log);
                         $return = 'Empezar';
                     }
                 }
@@ -190,7 +187,7 @@ if (!isset($_SESSION['iniciada'])){
         var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
         var ajaxXHR;
         var containerSala = document.getElementById("containerSala");
-        var btnReady = document.getElementById("btnListo");
+        var btnListo = document.getElementById("btnListo");
 
         var crearEvento = (function() {
             function w3c_crearEvento(elemento, evento, mifuncion) {
