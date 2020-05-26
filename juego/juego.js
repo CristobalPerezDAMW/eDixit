@@ -131,9 +131,11 @@ function enPeticionLista() {
 async function pedirEstadoJuego() {
     //Este método repite cada X tiempo la acción de actualizar los datos de la partida, una acción costosa que no debería realizarse con demasiada frecuencia para que cuanto más se haga mejor
     getAsync(urlGet + "?accion=get_estado_partida", true);
-    setTimeout(() => {
-        pedirEstadoJuego();
-    }, 1000);
+    if (estadoJuego != 'Final') {
+        setTimeout(() => {
+            pedirEstadoJuego();
+        }, 1000);
+    }
 };
 
 var ajaxXHR, body, divTusCartas, divJugadores, imgPerfil, divMensajes, mensaje1, mensaje2, mensajeImagen, mensajePista, divVotacion, divCartas, aceptarPuntuacion, eligeCarta, cartaElegida = 0,
@@ -344,8 +346,21 @@ function ponerEstado(eligeCartaAnterior) {
         }
     } else if (estadoJuego == "Final") {
         divCartas.classList.add("quitar");
+        var ganadores = new Array();
+        for (let i = 0; i < posicionJugadores.length; i++) {
+            if (posicionJugadores[1] >= 30) {
+                ganadores.push(posicionJugadores[0]);
+            }
+        }
         mensaje1.innerHTML = "Fin del juego";
-        mensaje2.innerHTML = "Ganadores: ";
+        mensaje2.innerHTML = "Ganadores: " + ganadores.join(", ") + "\n¡Bien jugado!";
+
+        let btnVolver = document.createElement("button");
+        btnVolver.innerHTML = "Salir del Juego";
+        crearEvento(btnVolver, "click", function() {
+            window.location.href = "..";
+        });
+        divMensajes.appendChild(btnVolver);
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
         mensaje1.innerHTML = "Error: El estado no existe";
@@ -418,7 +433,7 @@ function ponerEstado(eligeCartaAnterior) {
                     currentValue.classList.remove("cuentacuentos");
                     currentValue.title = jugadores[i].nombre + " (" + jugadores[i].correo + ")";
                 }
-                if (typeof posicionJugadores != "undefined" && typeof posicionJugadores[i] != "undefined") {
+                if (typeof posicionJugadores != "undefined" && typeof posicionJugadores[i] != "undefined" && typeof posicionJugadores[i][1] != "undefined") {
                     jugadores[i].posicion.innerHTML = "Puntos: " + posicionJugadores[i][1];
                 }
                 // for (let j = 0; j < listaFaltan.length; j++) {

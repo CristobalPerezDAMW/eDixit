@@ -1,6 +1,5 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-// Destáquese que todos los comentarios desaparecerán en las versiones de producción
 /* Estados del juego:
     "Inicio": No hay cuentacuentos, el primer jugador en elegir carta y pista se convierte el cuentacuentos y se pasa al estado "PensandoCartas"
     "PensandoCC": El cuentacuentos está pensando, es el primer estado del turno (excepto el primer turno)
@@ -78,6 +77,11 @@ if (isset($_GET['accion'])){
         } else if ($estado == 'Puntuacion'){
             $sql = 'SELECT `PuntuacionRonda` FROM `partida_jugador` WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\' AND `Partida`=\''.$id_partida.'\'';
             $puntuacion_ronda = mysqli_fetch_array($bbdd->query($sql))[0];
+        } else if ($estado == 'Final'){
+            $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
+            $bbdd->query($sql);
+            $sql = 'DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\'';
+            $bbdd->query($sql);
         }
     }else {
         die('Error: El jugador no está en ninguna partida');
@@ -93,7 +97,6 @@ if (isset($_GET['accion'])){
             (isset($puntuacion_ronda) ? ';'.$puntuacion_ronda : ';null').
             ';'.implode(',', $posiciones)
             );
-            break;
 
         case 'elegir_carta_inicio':
             if ($estado!='Inicio' || !isset($_GET['carta_elegida']) || !isset($_GET['pista']) || $_GET['pista']==null){
@@ -144,7 +147,6 @@ if (isset($_GET['accion'])){
             $resultado = $bbdd->query($sql);
 
             die('PensandoCartas;'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';null;'.implode(',', $faltan_elegir));
-            break;
 
             case 'elegir_carta_pensando_cc':
                 if ($estado!='PensandoCC' || $carta_elegida != null || $cuentacuentos != $_SESSION['usuario_correo']){
@@ -179,7 +181,6 @@ if (isset($_GET['accion'])){
                     }
                 }
                 die('PensandoCartas;'.$mano_jugador.';'.$cuentacuentos.';'.$pista.';null;'.implode(',', $faltan_elegir));
-                break;
     
             case 'elegir_carta_pensando_cartas':
                 if ($estado!='PensandoCartas' || $carta_elegida != null){
@@ -209,8 +210,6 @@ if (isset($_GET['accion'])){
                     $bbdd->close();
                     die('PensandoCartas');
                 }
-                // die('PensandoCartas;'.$mano_jugador.';null;null;'.$carta_elegida.';'.implode(',', $faltan_elegir));
-                break;
 
             case 'votar_carta':
                 if ($estado!='Votacion' || !isset($_GET['carta_votada']) || isset($carta_votada)){
@@ -280,7 +279,6 @@ if (isset($_GET['accion'])){
                     $bbdd->close();
                     die('Votacion');
                 }
-                break;
 
             case 'aceptar_puntuacion':
                 if ($estado!='Puntuacion' || !isset($puntuacion_ronda)){
@@ -335,7 +333,6 @@ if (isset($_GET['accion'])){
                     $bbdd->close();
                     die('PensandoCC;null;null;null;null;null;;;;;true');
                 }
-                break;
     }
 }
 
@@ -411,7 +408,7 @@ if (!$bbdd){
     if ($error){
         die('<p class="error">'.$error.'</p>');
     } else if (!$jugadores){
-        die('<p class="error">No estás en ninguna partida</p><br><p class="error">Normalmente te sacaría de nuevo al menú pero por ahora es recomendable saber cuándo ocurre esto.<br><a href=".." style="background: white; color: blue; font-size: 5rem">VOLVER</a></p>');
+        die('<script>window.location.href = "..";</script>');
     }
 ?>
 
