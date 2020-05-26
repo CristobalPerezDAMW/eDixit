@@ -15,7 +15,7 @@ $sql = 'SELECT Count(*) FROM `salas` WHERE `Anfitrion`=\''.$_SESSION['usuario_co
 if (mysqli_fetch_array($bbdd->query($sql))[0] > 0){
     ?>
         <div class="container alert-primary">
-            <h2 class="alert-primary-text">No puedes crear una sala porque ya estás en una</h2>
+            <h2 class="mensaje_importante">No puedes crear una sala porque ya estás en una</h2>
         </div>
     <?php
     die();
