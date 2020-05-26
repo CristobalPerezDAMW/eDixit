@@ -10,11 +10,6 @@ function init() {
     cEmail = document.getElementById("cEmail");
     cContra1 = document.getElementById("cContra1");
     cContra2 = document.getElementById("cContra2");
-    // console.log(cImagen);
-    // console.log(cNombre);
-    // console.log(cEmail);
-    // console.log(cContra1);
-    // console.log(cContra2);
 }
 
 function check() {
