@@ -78,10 +78,18 @@ if (isset($_GET['accion'])){
             $sql = 'SELECT `PuntuacionRonda` FROM `partida_jugador` WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\' AND `Partida`=\''.$id_partida.'\'';
             $puntuacion_ronda = mysqli_fetch_array($bbdd->query($sql))[0];
         } else if ($estado == 'Final'){
-            $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
-            $bbdd->query($sql);
-            $sql = 'DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\'';
-            $bbdd->query($sql);
+            //Se va a ejecutar para cada jugador, pero no importa demasiado
+            class HiloBorrar extends Thread {
+                public function run() {
+                    sleep(3);
+                    $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
+                    $bbdd->query($sql);
+                    $sql = 'DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\'';
+                    $bbdd->query($sql);
+                }
+            }
+            $hilo = new HiloBorrar();
+            $hilo->start();
         }
     }else {
         die('Error: El jugador no está en ninguna partida');

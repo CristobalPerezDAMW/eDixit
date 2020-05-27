@@ -11,21 +11,59 @@ $bbdd = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bb
 if (!$bbdd){
     die('<p style="color: red;">Error al conectar la base de datos</p>');
 }
-$sql = 'SELECT Count(*) FROM `salas` WHERE `Anfitrion`=\''.$_SESSION['usuario_correo'].'\'';
-if (mysqli_fetch_array($bbdd->query($sql))[0] > 0){
-    ?>
+if (isset($_SESSION['iniciada'])){
+    $sql = 'SELECT Count(*) FROM `salas` WHERE `Anfitrion`=\''.$_SESSION['usuario_correo'].'\'';
+    if (mysqli_fetch_array($bbdd->query($sql))[0] > 0){
+        ?>
         <div class="container alert-primary">
             <h2 class="mensaje_importante">No puedes crear una sala porque ya estás en una</h2>
         </div>
+        <?php
+        die();
+    //} else if (isset($_POST['crear_sala_edixit'], $_POST['desc_edixit'], $_POST['max_edixit'], $_POST['privada_edixit'], $_POST['contra_edixit'])){
+    } else if (isset($_POST['crear_sala_edixit'])){
+        $sql = 'INSERT INTO `salas`(`Anfitrion`, `Descripcion`, `Maximo`'.(isset($_POST['privada_edixit']) ? ', `Contra`' : '').') 
+        VALUES (\''.$_SESSION['usuario_correo'].'\',\''.$_POST['desc_edixit'].'\',\''.$_POST['max_edixit'].'\''.(isset($_POST['privada_edixit'])?',\''.$_POST['contra_edixit'].'\'':'').')';
+        // var_export($_POST);
+        // echo '<br>';
+        // die($sql);
+        $bbdd->query($sql);
+        die('<script>location.href = ".."</script>');
+    }
+} else {
+    ?>
+    <div class="container alert-primary">
+        <h2 class="mensaje_importante">No puedes crear una sala porque no has iniciado sesión</h2>
+    </div>
     <?php
-    die();
 }
 
 $bbdd->close();
 ?>
 
 <script>
-function submit() {
+var iDesc, iMax, iPrivada, iContra;
+
+function init() {
+    iDesc = document.getElementById("txtDesc");
+    iMax = document.getElementById("numMax");
+    iPrivada = document.getElementById("cbPrivada");
+    iContra = document.getElementById("pwContra");
+
+    iDesc.addEventListener("click", function(evento) {
+        iDesc.setSelectionRange(0, iDesc.value.length)
+    });
+
+    iPrivada.addEventListener("click", function(evento) {
+        if (evento.target.checked) {
+            iContra.disabled = false;
+        } else {
+            iContra.disabled = true;
+        }
+    });
+}
+
+function check() {
     if (iMax.value <= 2) {
         alert("No pueden jugar menos de 3 personas a eDixit");
     } else if (iMax.value > 12) {
@@ -37,31 +75,16 @@ function submit() {
     }
     return false;
 };
-
-function init() {
-    // var iDesc = document.getElementById("txtDesc");
-    var iMax = document.getElementById("numMax");
-    var iPrivada = document.getElementById("cbPrivada");
-    var iContra = document.getElementById("pwContra");
-
-    iPrivada.addEventListener("click", function(evento) {
-        if (evento.target.checked) {
-            iContra.disabled = false;
-        } else {
-            iContra.disabled = true;
-        }
-    });
-}
 </script>
 <div class="container">
     <div class="row">
         <div class="col-12">
             <fieldset>
                 <legend>Datos de tu sala</legend>
-                <form method="POST" onsubmit="submit(); return false;">
+                <form method="POST" onsubmit="return check()">
                     <div class="form-group">
                         <label for="txtDesc">Descripción</label>
-                        <input type="text" class="form-control" name="desc_edixit" id="txtDesc" placeholder="¡Vamos a pasarlo bien!">
+                        <input type="text" class="form-control" name="desc_edixit" id="txtDesc" value="¡Vamos a pasarlo bien!" >
                     </div>
                     <div class="form-group">
                         <label for="numMax">Máximo de personas</label>
@@ -80,7 +103,13 @@ function init() {
                         <input type="password" class="form-control" name="contra_edixit" id="pwContra" disabled autocomplete="off">
                     </div>
 
-                    <button type="submit" value="crear_sala_edixit" class="btn btn-primary">Crear Sala</button>
+                    <?php
+                    if (isset($_SESSION['iniciada'])){
+                        echo '<button type="submit" name="crear_sala_edixit" class="btn btn-primary">Crear Sala</button>';
+                    } else {
+                        echo '<button class="btn btn-disabled" disabled>Crear Sala (debes iniciar sesión)</button>';
+                    }
+                    ?>
                 </form>
             </fieldset>
         </div>

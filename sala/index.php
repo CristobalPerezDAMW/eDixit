@@ -1,7 +1,7 @@
 <?php
 session_start();
-// error_reporting(E_ALL);
-// ini_set('display_errors', 'on');
+error_reporting(E_ALL);
+ini_set('display_errors', 'on');
 
 require('../bbdd.php');
 $bbdd = mysqli_connect($BBDD->servidor, $BBDD->usuario, $BBDD->contra, $BBDD->bbdd);
@@ -16,22 +16,31 @@ if (isset($_GET['accion'])){
                 die('Error: Información incompleta');
             }
             // die('admin@admin.ga:1;cristichi@hotmail.es:1;Chiquito de la Calzada:1');
-            $sql = 'SELECT `Jugador`, `Listo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND `Id`=\''.$_GET['sala'].'\'';
+            $sql = 'SELECT `Jugador`, `Listo`, `Maximo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND `Id`=\''.$_GET['sala'].'\'';
             // die($sql);
             $resultado = $bbdd->query($sql);
             if ($resultado===false){
                 die('Error: '.$bbdd->errno);
             }
             $todos = true;
+            $participantes = [];
             while ($fila = mysqli_fetch_array($resultado)){
                 $participantes[] = $fila[0].':'.$fila[1];
                 if ($fila[1]!=1){
                     $todos = false;
                 }
+                $max = $fila[2];
             }
-            if ($todos){
+            if ($todos && isset($max) && count($participantes)+1>=$max){
                 die('Empezar');
             }
+            var_export($todos);
+            echo '<br>';
+            var_export($max);
+            echo '<br>';
+            var_export($participantes);
+            echo '<br>';
+            die();
             die(join(';', $participantes));
 
             case 'estoy_listo':
@@ -39,7 +48,7 @@ if (isset($_GET['accion'])){
                     die('Error: Información incompleta');
                 }
                 $return = 'Listo';
-                $sql = 'SELECT `Jugador`, `Listo`, `Anfitrion` FROM `sala_jugador`, `salas` WHERE `Id`=`Sala` AND `Sala`=\''.$_GET['sala'].'\'';
+                $sql = 'SELECT `Jugador`, `Listo`, `Anfitrion`, `Maximo` FROM `sala_jugador`, `salas` WHERE `Id`=`Sala` AND `Sala`=\''.$_GET['sala'].'\'';
                 $resultado = $bbdd->query($sql);
                 if ($resultado===false){
                     die('Error: Error al acceder a la base de datos');
@@ -52,18 +61,17 @@ if (isset($_GET['accion'])){
                     }
                     $jugadores[] = array($fila[0], '');
                     $host = $fila[2];
+                    $max = $fila[3];
                 }
                 $jugadores[] = array($host, '');
-                var_export($jugadores);
-                //Si falta 1 y es el que va a estar listo ahora, empieza el juego
-                if ($cont==1){
+                //Si falta 1 y es el que va a estar listo ahora, y la sala está llena, empieza el juego
+                if (count($jugadores)==$max && $cont==1){
                     if ($jugador_falta==$_SESSION['usuario_correo']){
                         $resultado = $bbdd->query($sql);
                         //Vamos a preparar la partida, necesitamos generar primero las manos de los jugadores y también guardar las cartas sobrantes. Lo haremos a partir del número de cartas (Y), sabiendo que existen todas las cartas del formato carta(X).jpg donde X es un número entero dentro de [1, Y]
                         //(El máximo hay que modificarlo si se agregan o quitan cartas)
                         //Pasos a seguir:
                         //Paso 1: generamos el array de números y lo barajamos
-                        //Paso 4: Creamos la partida
                         $max = 50;
                         for ($i=1; $i <= $max; $i++) { 
                             $cartas[] = $i; 
@@ -76,6 +84,8 @@ if (isset($_GET['accion'])){
                         for($i=0; $i<count($jugadores); $i++){
                             $jugadores[$i][1] = array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas);
                         }
+                        
+                        //Paso 4: Creamos la partida
                         $bbdd->begin_transaction();
 
                         $bbdd->query('INSERT INTO `partidas`(`Id`, `CartasPila`)
@@ -94,7 +104,6 @@ if (isset($_GET['accion'])){
 
                 die($return);
     }
-    die();
 }
 
 $ruta='..';
@@ -125,185 +134,192 @@ if (!isset($_SESSION['iniciada'])){
     }
 
     //Si el usuario ya está en una sala, no se mostrará otra cosa más que la sala
-    //Aquí va acceso a la base de datos
-    $sql = 'SELECT `Id`, `Anfitrion`, `Descripcion`, `Maximo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND (`Jugador`=\''.$_SESSION['usuario_correo'].'\' || `Anfitrion`=\''.$_SESSION['usuario_correo'].'\')';
+    // $sql = 'SELECT `Id`, `Anfitrion`, `Descripcion`, `Maximo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND (`Jugador`=\''.$_SESSION['usuario_correo'].'\' OR `Anfitrion`=\''.$_SESSION['usuario_correo'].'\')';
+    $sql = 'SELECT `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Jugador` FROM `salas` LEFT JOIN `sala_jugador` ON (`Id`=`Sala` AND  `Jugador`=\''.$_SESSION['usuario_correo'].'\') OR `Anfitrion`=\''.$_SESSION['usuario_correo'].'\'';
+    // $sql = 'SELECT `Id`, `Anfitrion`, `Descripcion`, `Maximo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND  `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
+    // die($sql);
     $resultado = $bbdd->query($sql);
     if ($resultado===false){
-        die('<h3 class="salas">Error al conectar, sentimos las molestias</h3>');
+        die('<h3 class="salas">Error al conectar con la base de datos, sentimos las molestias</h3>');
     } else if ($fila = mysqli_fetch_array($resultado)){
         $id = $fila[0];
         $host = $fila[1];
         $participantes[0] = array($fila[1], 1);
         $desc = $fila[2];
         $max = $fila[3];
+        $jug = $fila[4];
 
-        $sql = 'SELECT `Jugador`, `Listo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND `Anfitrion`=\''.$host.'\'';
-        // die($sql);
-        $resultado = $bbdd->query($sql);
-        $listo = 1;
-        while ($fila = mysqli_fetch_array($resultado)){
-            $participantes[] = array($fila[0], $fila[1]);
-            if ($fila[0]==$_SESSION['usuario_correo']){
-                $listo = $fila[1];
+        if ($host==$_SESSION['usuario_correo'] || $jug==$_SESSION['usuario_correo']){
+            $sql = 'SELECT `Jugador`, `Listo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND `Anfitrion`=\''.$host.'\'';
+            // die($sql);
+            $resultado = $bbdd->query($sql);
+            $listo = 1;
+            $num_jug = 1;
+            while ($fila = mysqli_fetch_array($resultado)){
+                $participantes[] = array($fila[0], $fila[1]);
+                $num_jug++;
+                if ($fila[0]==$_SESSION['usuario_correo']){
+                    $listo = $fila[1];
+                }
             }
-        }
-        echo '<div class="container sala" id="containerSala">
-            <div class="row cabecera">
-                <div class="col-12">
-                    Sala de '.$host.'
-                </div>
-            </div>
-            <div class="row subcabecera">
-                <div class="col-12">
-                    Jugadores:
-                </div>
-            </div>';
-        foreach ($participantes as $p) {
-            echo '<div class="row jugador" id="jug-'.$p[0].'" data-listo="'.$p[1].'">
-                <div class="col-sm-6">'.
-                    $p[0].'
-                </div>
-                <div class="col-sm-6">'.
-                    ($p[1]==0
-                    ?'<svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="square" class="svg-inline--fa fa-square fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="red" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z"></path></svg> No preparado'
-                    :'<svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="check-square" class="svg-inline--fa fa-check-square fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="green" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm0 400H48V80h352v352zm-35.864-241.724L191.547 361.48c-4.705 4.667-12.303 4.637-16.97-.068l-90.781-91.516c-4.667-4.705-4.637-12.303.069-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l59.792 60.277 141.352-140.216c4.705-4.667 12.303-4.637 16.97.068l22.536 22.718c4.667 4.706 4.637 12.304-.068 16.971z"></path></svg> Preparado').'
-                </div>
-            </div>';
-        }
-        echo '</div>
-        </div>';
-        if ($listo==0){
-            echo '<div class="container" id="containerListo">
-                <div class="row">
+            echo '<div class="container sala" id="containerSala">
+                <div class="row cabecera">
                     <div class="col-12">
-                        <button id="btnListo">Estoy Preparado</button>
+                        Sala de '.$host.'
                     </div>
                 </div>
+                <div class="row subcabecera">
+                    <div class="col-12">
+                        Jugadores: '.$num_jug.'/'.$max.'
+                    </div>
+                </div>';
+            foreach ($participantes as $p) {
+                echo '<div class="row jugador" id="jug-'.$p[0].'" data-listo="'.$p[1].'">
+                    <div class="col-sm-6">'.
+                        $p[0].'
+                    </div>
+                    <div class="col-sm-6">'.
+                        ($p[1]==0
+                        ?'<svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="square" class="svg-inline--fa fa-square fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="red" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z"></path></svg> No preparado'
+                        :'<svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="check-square" class="svg-inline--fa fa-check-square fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="green" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm0 400H48V80h352v352zm-35.864-241.724L191.547 361.48c-4.705 4.667-12.303 4.637-16.97-.068l-90.781-91.516c-4.667-4.705-4.637-12.303.069-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l59.792 60.277 141.352-140.216c4.705-4.667 12.303-4.637 16.97.068l22.536 22.718c4.667 4.706 4.637 12.304-.068 16.971z"></path></svg> Preparado').'
+                    </div>
+                </div>';
+            }
+            echo '</div>
             </div>';
-        }
-        ?>
-        <script>
-        //Necesario para ir actualizando los datos de la sala
-        var sala = <?php echo $id?>;
-        var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
-        var ajaxXHR;
-        var containerSala = document.getElementById("containerSala");
-        var btnListo = document.getElementById("btnListo");
+            if ($listo==0){
+                echo '<div class="container" id="containerListo">
+                    <div class="row">
+                        <div class="col-12">
+                            <button id="btnListo">Estoy Preparado</button>
+                        </div>
+                    </div>
+                </div>';
+            }
+            ?>
+            <script>
+            //Necesario para ir actualizando los datos de la sala
+            var sala = <?php echo $id?>;
+            var urlGet = "<?php echo $_SERVER['PHP_SELF'] ?>";
+            var ajaxXHR;
+            var containerSala = document.getElementById("containerSala");
+            var btnListo = document.getElementById("btnListo");
 
-        var crearEvento = (function() {
-            function w3c_crearEvento(elemento, evento, mifuncion) {
-                elemento.addEventListener(evento, mifuncion, false);
+            var crearEvento = (function() {
+                function w3c_crearEvento(elemento, evento, mifuncion) {
+                    elemento.addEventListener(evento, mifuncion, false);
+                }
+
+                function ie_crearEvento(elemento, evento, mifuncion) {
+                    var fx = function() {
+                        mifuncion.call(elemento);
+                    };
+                    elemento.attachEvent("on" + evento, fx);
+                }
+                if (typeof window.addEventListener !== "undefined") {
+                    return w3c_crearEvento;
+                } else if (typeof window.attachEvent !== "undefined") {
+                    return ie_crearEvento;
+                }
+            })();
+
+            function objetoXHR() {
+                if (window.XMLHttpRequest) {
+                    return new XMLHttpRequest();
+                } else if (window.ActiveXObject) {
+                    var versionesIE = new Array(
+                        "Msxml2.XMLHTTP.5.0",
+                        "Msxml2.XMLHTTP.4.0",
+                        "Msxml2.XMLHTTP.3.0",
+                        "Msxml2.XMLHTTP",
+                        "Microsoft.XMLHTTP"
+                    );
+                    for (var i = 0; i < versionesIE.length; i++) {
+                        try {
+                            return new ActiveXObject(versionesIE[i]);
+                        } catch (errorControlado) {}
+                    }
+                }
+                throw new Error("No se pudo crear el objeto XMLHttpRequest");
             }
 
-            function ie_crearEvento(elemento, evento, mifuncion) {
-                var fx = function() {
-                    mifuncion.call(elemento);
-                };
-                elemento.attachEvent("on" + evento, fx);
-            }
-            if (typeof window.addEventListener !== "undefined") {
-                return w3c_crearEvento;
-            } else if (typeof window.attachEvent !== "undefined") {
-                return ie_crearEvento;
-            }
-        })();
-
-        function objetoXHR() {
-            if (window.XMLHttpRequest) {
-                return new XMLHttpRequest();
-            } else if (window.ActiveXObject) {
-                var versionesIE = new Array(
-                    "Msxml2.XMLHTTP.5.0",
-                    "Msxml2.XMLHTTP.4.0",
-                    "Msxml2.XMLHTTP.3.0",
-                    "Msxml2.XMLHTTP",
-                    "Microsoft.XMLHTTP"
-                );
-                for (var i = 0; i < versionesIE.length; i++) {
-                    try {
-                        return new ActiveXObject(versionesIE[i]);
-                    } catch (errorControlado) {}
+            function getAsync(url) {
+                if (ajaxXHR) {
+                    ajaxXHR.open('GET', encodeURI(url), true);
+                    ajaxXHR.onreadystatechange = enPeticionLista;
+                    ajaxXHR.send(null);
                 }
             }
-            throw new Error("No se pudo crear el objeto XMLHttpRequest");
-        }
 
-        function getAsync(url) {
-            if (ajaxXHR) {
-                ajaxXHR.open('GET', encodeURI(url), true);
-                ajaxXHR.onreadystatechange = enPeticionLista;
-                ajaxXHR.send(null);
-            }
-        }
-
-        function enPeticionLista() {
-            if (this.readyState == 4 && this.status == 200) {
-                if (this.responseText.startsWith('Error') !== false) {
-                    console.log(this.responseText);
-                } else if (this.responseText == 'Empezar') {
-                    window.location.href = '../juego';
-                } else if (this.responseText == 'Listo') {
-                    btnListo.parentNode.removeChild(btnListo);
-                } else {
-                    let participantes = this.responseText.split(";");
-                    
-                    participantes.forEach(p => {
-                        let jugador = p.split(':');
-                        let listo = jugador[1];
-                        jugador = jugador[0];
+            function enPeticionLista() {
+                if (this.readyState == 4 && this.status == 200) {
+                    if (this.responseText.startsWith("Error") !== false) {
+                        console.log(this.responseText);
+                    } else if (this.responseText == "Empezar") {
+                        window.location.href = "../juego";
+                    } else if (this.responseText == "Listo") {
+                        btnListo.parentNode.removeChild(btnListo);
+                    } else if (this.responseText != "") {
+                        let participantes = this.responseText.split(";");
                         
-                        let elementoYaExistente = document.getElementById("jug-"+jugador);
-                        if (elementoYaExistente==null || elementoYaExistente.dataset.listo != listo){
-                            if (elementoYaExistente!=null){
-                                containerSala.removeChild(elementoYaExistente);
+                        participantes.forEach(p => {
+                            let jugador = p.split(':');
+                            let listo = jugador[1];
+                            jugador = jugador[0];
+                            
+                            let elementoYaExistente = document.getElementById("jug-"+jugador);
+                            if (elementoYaExistente==null || elementoYaExistente.dataset.listo != listo){
+                                if (elementoYaExistente!=null){
+                                    containerSala.removeChild(elementoYaExistente);
+                                }
+                                let divRowJugador = document.createElement("div");
+                                divRowJugador.classList.add("row");
+                                divRowJugador.classList.add("jugador");
+                                divRowJugador.id = "jug-"+jugador;
+                                divRowJugador.dataset.listo = listo;
+                                
+                                let divRowJugCorreo = document.createElement("div");
+                                divRowJugCorreo.classList.add("col-sm-6");
+                                divRowJugCorreo.innerHTML = jugador;
+                                divRowJugador.appendChild(divRowJugCorreo);
+                                
+                                let divRowJugListo = document.createElement("div");
+                                divRowJugListo.classList.add("col-sm-6");
+                                if (listo==0){
+                                    divRowJugListo.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="square" class="svg-inline--fa fa-square fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="red" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z"></path></svg> No preparado';
+                                }else {
+                                    divRowJugListo.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="check-square" class="svg-inline--fa fa-check-square fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="green" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm0 400H48V80h352v352zm-35.864-241.724L191.547 361.48c-4.705 4.667-12.303 4.637-16.97-.068l-90.781-91.516c-4.667-4.705-4.637-12.303.069-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l59.792 60.277 141.352-140.216c4.705-4.667 12.303-4.637 16.97.068l22.536 22.718c4.667 4.706 4.637 12.304-.068 16.971z"></path></svg> Preparado';
+                                }
+                                divRowJugador.appendChild(divRowJugListo);
+                                
+                                containerSala.appendChild(divRowJugador);
                             }
-                            let divRowJugador = document.createElement("div");
-                            divRowJugador.classList.add("row");
-                            divRowJugador.classList.add("jugador");
-                            divRowJugador.id = "jug-"+jugador;
-                            divRowJugador.dataset.listo = listo;
-                            
-                            let divRowJugCorreo = document.createElement("div");
-                            divRowJugCorreo.classList.add("col-sm-6");
-                            divRowJugCorreo.innerHTML = jugador;
-                            divRowJugador.appendChild(divRowJugCorreo);
-                            
-                            let divRowJugListo = document.createElement("div");
-                            divRowJugListo.classList.add("col-sm-6");
-                            if (listo==0){
-                                divRowJugListo.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="square" class="svg-inline--fa fa-square fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="red" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z"></path></svg> No preparado';
-                            }else {
-                                divRowJugListo.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="check-square" class="svg-inline--fa fa-check-square fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="green" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm0 400H48V80h352v352zm-35.864-241.724L191.547 361.48c-4.705 4.667-12.303 4.637-16.97-.068l-90.781-91.516c-4.667-4.705-4.637-12.303.069-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l59.792 60.277 141.352-140.216c4.705-4.667 12.303-4.637 16.97.068l22.536 22.718c4.667 4.706 4.637 12.304-.068 16.971z"></path></svg> Preparado';
-                            }
-                            divRowJugador.appendChild(divRowJugListo);
-                            
-                            containerSala.appendChild(divRowJugador);
-                        }
-                    });
+                        });
+                    }
                 }
             }
-        }
 
-        async function pedirEstadoSala() {
-            //Este método repite cada X tiempo la acción de actualizar los datos de la partida, una acción costosa que no debería realizarse con demasiada frecuencia para que cuanto más se haga mejor
-            getAsync(urlGet + "?accion=get_estado_sala&sala="+sala);
-            setTimeout(() => {
+            async function pedirEstadoSala() {
+                //Este método repite cada X tiempo la acción de actualizar los datos de la partida, una acción costosa que no debería realizarse con demasiada frecuencia para que cuanto más se haga mejor
+                getAsync(urlGet + "?accion=get_estado_sala&sala="+sala);
+                setTimeout(() => {
+                    pedirEstadoSala();
+                }, 2000);
+            };
+
+            function init(){
+                ajaxXHR = new objetoXHR();
+                if (btnListo != null){
+                    crearEvento(btnListo, "click", function() {
+                        getAsync(urlGet+"?accion=estoy_listo&sala="+sala);
+                    });
+                } 
                 pedirEstadoSala();
-            }, 2000);
-        };
-
-        function init(){
-            ajaxXHR = new objetoXHR();
-            if (btnListo != null){
-                crearEvento(btnListo, "click", function() {
-                    getAsync(urlGet+"?accion=estoy_listo&sala="+sala);
-                });
-            } 
-            pedirEstadoSala();
+            }
+            </script>
+            <?php
+            die();
         }
-        </script>
-        <?php
-        die();
     }
 }
 
