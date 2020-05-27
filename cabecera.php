@@ -57,8 +57,9 @@ if (isset($_SESSION['iniciada'])){
         <nav class="navbar navbar-expand-md navbar-light bg-light">
             <header>
                 <?php
+                $esInicio = $pag=='Inicio';
                 echo '
-                <a class="navbar-brand" href="'.$ruta.'">
+                <a class="navbar-brand" '.($esInicio?'':'href="'.$ruta.'"').'>
                     <img src="'.$ruta.'/imgs/edixit-banner.png" alt="Logo eDixit">
                 </a>
                 ';
@@ -72,7 +73,6 @@ if (isset($_SESSION['iniciada'])){
             <div class="collapse navbar-collapse" id="collapsibleNavId">
                 <ul class="navbar-nav ml-auto mt-2 mt-md-0">
                     <?php
-                    $esInicio = $pag=='Inicio';
                     echo '
                     <li class="nav-item '.($esInicio?'disabled':'active').'">
                         <a class="nav-link '.($esInicio?'disabled':'').'" href="'.$ruta.'">Inicio</a>
