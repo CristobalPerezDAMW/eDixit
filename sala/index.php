@@ -16,6 +16,13 @@ if (isset($_GET['accion'])){
                 die('Error: Información incompleta');
             }
             // die('admin@admin.ga:1;cristichi@hotmail.es:1;Chiquito de la Calzada:1');
+            $sql = 'SELECT `Id` FROM `salas` WHERE `Id`=\''.$_GET['sala'].'\'';
+            // die($sql);
+            $resultado = $bbdd->query($sql);
+            if (!mysqli_fetch_array($resultado)){
+                die('No existe');
+            }
+
             $sql = 'SELECT `Jugador`, `Listo`, `Maximo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND `Id`=\''.$_GET['sala'].'\'';
             // die($sql);
             $resultado = $bbdd->query($sql);
@@ -34,75 +41,78 @@ if (isset($_GET['accion'])){
             if ($todos && isset($max) && count($participantes)+1>=$max){
                 die('Empezar');
             }
-            var_export($todos);
-            echo '<br>';
-            var_export($max);
-            echo '<br>';
-            var_export($participantes);
-            echo '<br>';
-            die();
             die(join(';', $participantes));
+        case 'salir':
+            if (!isset($_GET['sala'])){
+                die('Error: Información incompleta');
+            }
+            // die('admin@admin.ga:1;cristichi@hotmail.es:1;Chiquito de la Calzada:1');
+            $sql = 'DELETE FROM `sala_jugador` WHERE `Jugador`= \''.$_SESSION['usuario_correo'].'\' AND `Sala`=\''.$_GET['sala'].'\'';
+            $bbdd->query($sql);
+            $sql = 'DELETE FROM `salas` WHERE `Anfitrion`= \''.$_SESSION['usuario_correo'].'\'';
+            $bbdd->query($sql);
+            die('Has salido');
 
-            case 'estoy_listo':
-                if (!isset($_GET['sala'])){
-                    die('Error: Información incompleta');
+        case 'estoy_listo':
+            if (!isset($_GET['sala'])){
+                die('Error: Información incompleta');
+            }
+            $return = 'Listo';
+            $sql = 'SELECT `Jugador`, `Listo`, `Anfitrion`, `Maximo` FROM `sala_jugador`, `salas` WHERE `Id`=`Sala` AND `Sala`=\''.$_GET['sala'].'\'';
+            $resultado = $bbdd->query($sql);
+            if ($resultado===false){
+                die('Error: Error al acceder a la base de datos');
+            }
+            $cont = 0;
+            while($fila = mysqli_fetch_array($resultado)){
+                if ($fila[1]==0){
+                    $cont++;
+                    $jugador_falta = $fila[0];
                 }
-                $return = 'Listo';
-                $sql = 'SELECT `Jugador`, `Listo`, `Anfitrion`, `Maximo` FROM `sala_jugador`, `salas` WHERE `Id`=`Sala` AND `Sala`=\''.$_GET['sala'].'\'';
-                $resultado = $bbdd->query($sql);
-                if ($resultado===false){
-                    die('Error: Error al acceder a la base de datos');
-                }
-                $cont = 0;
-                while($fila = mysqli_fetch_array($resultado)){
-                    if ($fila[1]==0){
-                        $cont++;
-                        $jugador_falta = $fila[0];
+                $jugadores[] = array($fila[0], '');
+                $host = $fila[2];
+                $max = $fila[3];
+            }
+            $jugadores[] = array($host, '');
+            //Si falta 1 y es el que va a estar listo ahora, y la sala está llena, empieza el juego
+            if (count($jugadores)==$max && $cont==1){
+                if ($jugador_falta==$_SESSION['usuario_correo']){
+                    $resultado = $bbdd->query($sql);
+                    //Vamos a preparar la partida, necesitamos generar primero las manos de los jugadores y también guardar las cartas sobrantes. Lo haremos a partir del número de cartas (Y), sabiendo que existen todas las cartas del formato carta(X).jpg donde X es un número entero dentro de [1, Y]
+                    //(El máximo hay que modificarlo si se agregan o quitan cartas)
+                    //Pasos a seguir:
+                    //Paso 1: generamos el array de números y lo barajamos
+                    $max = 50;
+                    for ($i=1; $i <= $max; $i++) { 
+                        $cartas[] = $i; 
                     }
-                    $jugadores[] = array($fila[0], '');
-                    $host = $fila[2];
-                    $max = $fila[3];
-                }
-                $jugadores[] = array($host, '');
-                //Si falta 1 y es el que va a estar listo ahora, y la sala está llena, empieza el juego
-                if (count($jugadores)==$max && $cont==1){
-                    if ($jugador_falta==$_SESSION['usuario_correo']){
-                        $resultado = $bbdd->query($sql);
-                        //Vamos a preparar la partida, necesitamos generar primero las manos de los jugadores y también guardar las cartas sobrantes. Lo haremos a partir del número de cartas (Y), sabiendo que existen todas las cartas del formato carta(X).jpg donde X es un número entero dentro de [1, Y]
-                        //(El máximo hay que modificarlo si se agregan o quitan cartas)
-                        //Pasos a seguir:
-                        //Paso 1: generamos el array de números y lo barajamos
-                        $max = 50;
-                        for ($i=1; $i <= $max; $i++) { 
-                            $cartas[] = $i; 
-                        }
-                        shuffle($cartas);
-                        //Paso 2: Damos 6 cartas a cada jugador
-                        if (count($jugadores)*6 >= $max){
-                            die('Error: No hay cartas para tantos jugadores ('.(count($jugadores)*6).' >= '.$max.')');
-                        }
-                        for($i=0; $i<count($jugadores); $i++){
-                            $jugadores[$i][1] = array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas);
-                        }
-                        
-                        //Paso 4: Creamos la partida
-                        $bbdd->begin_transaction();
-
-                        $bbdd->query('INSERT INTO `partidas`(`Id`, `CartasPila`)
-                        VALUES (\''.$_GET['sala'].'\', \''.join(':', $cartas).'\')');
-                        foreach($jugadores as $j){
-                            $bbdd->query('INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Mano`)
-                            VALUES (\''.$_GET['sala'].'\', \''.$j[0].'\', \''.$j[1].'\')');
-                        }
-                        $bbdd->commit();
-                        $return = 'Empezar';
+                    shuffle($cartas);
+                    //Paso 2: Damos 6 cartas a cada jugador
+                    if (count($jugadores)*6 >= $max){
+                        die('Error: No hay cartas para tantos jugadores ('.(count($jugadores)*6).' >= '.$max.')');
                     }
+                    for($i=0; $i<count($jugadores); $i++){
+                        $jugadores[$i][1] = array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas).':'.array_shift($cartas);
+                    }
+                    
+                    //Paso 4: Creamos la partida
+                    $bbdd->begin_transaction();
+
+                    $bbdd->query('INSERT INTO `partidas`(`Id`, `CartasPila`)
+                    VALUES (\''.$_GET['sala'].'\', \''.join(':', $cartas).'\')');
+                    foreach($jugadores as $j){
+                        $bbdd->query('INSERT INTO `partida_jugador`(`Partida`, `Jugador`, `Mano`)
+                        VALUES (\''.$_GET['sala'].'\', \''.$j[0].'\', \''.$j[1].'\')');
+                    }
+                    $bbdd->commit();
+                    $return = 'Empezar';
                 }
+            }
 
-                $sql = 'UPDATE `sala_jugador` SET `Listo`=\'1\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
-                $bbdd->query($sql);
+            $sql = 'UPDATE `sala_jugador` SET `Listo`=\'1\' WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\'';
+            $bbdd->query($sql);
 
-                die($return);
+            die($return);
     }
 }
 
@@ -186,7 +196,14 @@ if (!isset($_SESSION['iniciada'])){
                 </div>';
             }
             echo '</div>
-            </div>';
+            </div>
+        <div class="container" id="containerListo">
+            <div class="row">
+                <div class="col-12">
+                    <button id="btnSalir">Salir de la sala</button>
+                </div>
+            </div>
+        </div>';
             if ($listo==0){
                 echo '<div class="container" id="containerListo">
                     <div class="row">
@@ -204,6 +221,7 @@ if (!isset($_SESSION['iniciada'])){
             var ajaxXHR;
             var containerSala = document.getElementById("containerSala");
             var btnListo = document.getElementById("btnListo");
+            var btnSalir = document.getElementById("btnSalir");
 
             var crearEvento = (function() {
                 function w3c_crearEvento(elemento, evento, mifuncion) {
@@ -253,12 +271,15 @@ if (!isset($_SESSION['iniciada'])){
 
             function enPeticionLista() {
                 if (this.readyState == 4 && this.status == 200) {
+                        console.log(this.responseText);
                     if (this.responseText.startsWith("Error") !== false) {
                         console.log(this.responseText);
                     } else if (this.responseText == "Empezar") {
                         window.location.href = "../juego";
                     } else if (this.responseText == "Listo") {
                         btnListo.parentNode.removeChild(btnListo);
+                    } else if (this.responseText == "Has salido" || this.responseText == "No existe") {
+                        location.reload();
                     } else if (this.responseText != "") {
                         let participantes = this.responseText.split(";");
                         
@@ -313,7 +334,13 @@ if (!isset($_SESSION['iniciada'])){
                     crearEvento(btnListo, "click", function() {
                         getAsync(urlGet+"?accion=estoy_listo&sala="+sala);
                     });
-                } 
+                }
+                crearEvento(btnSalir, "click", function() {
+                    if (confirm('¿Seguro que quieres salir? Si creaste la sala, la borrarás')){
+                        getAsync(urlGet+"?accion=salir&sala="+sala);
+                        location.href = location.href;    
+                    }
+                });
                 pedirEstadoSala();
             }
             </script>
