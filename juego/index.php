@@ -49,7 +49,7 @@ if (isset($_GET['accion'])){
         $resultado = $bbdd->query($sql);
         while ($fila = mysqli_fetch_array($resultado)){
             $posiciones[] = $fila[0].':'.$fila[1];
-            if ($fila[1]>=30){
+            if ($fila[1]>=30 && $estado!='Puntuacion'){
                 $estado = 'Final';
             }
         }
@@ -83,11 +83,11 @@ if (isset($_GET['accion'])){
             //Se va a ejecutar para cada jugador, pero no importa demasiado
             // class HiloBorrar extends Thread {
             //     public function run() {
-                    // sleep(3);
-                    $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
-                    $bbdd->query($sql);
-                    $sql = 'DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\'';
-                    $bbdd->query($sql);
+                    // sleep(6);
+                    // $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
+                    // $bbdd->query($sql);
+                    // $sql = 'DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\'';
+                    // $bbdd->query($sql);
             //     }
             // }
             // $hilo = new HiloBorrar();
