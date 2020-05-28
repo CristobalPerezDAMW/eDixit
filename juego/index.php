@@ -240,7 +240,7 @@ if (isset($_GET['accion'])){
                     }
 
                     /*
-                    admin(cuentacuentos) - Elegida: 3, Votada: NULL, Puntuación deseada: 3
+                    admin (cc) - Elegida: 3, Votada: NULL, Puntuación deseada: 3
                     cris - Elegida: 10, Votada: 13, Puntuación deseada: 0
                     usuario - Elegida: 13, Votada: 3, Puntuación deseada: 3+1
                     */
@@ -251,9 +251,10 @@ if (isset($_GET['accion'])){
                     $log = '';
                     foreach ($jugadores as $jugador => $datos) {
                         foreach ($jugadores as $jJ => $dJ) {
-                            if ($jJ != $cuentacuentos){
+                            if ($jJ != $cuentacuentos && $jugador!=$cuentacuentos){
                                 if ($dJ[1] == $datos[0]) {
                                     $datos[2]++;
+                                    $log.="\n$dJ[1] == $datos[0] comparando $jJ con $jugador";
                                 } else {
                                     $log.="\n$dJ[1] != $datos[0] comparando $jJ con $jugador";
                                 }
@@ -333,6 +334,7 @@ if (isset($_GET['accion'])){
                     }
 
                     $sql = 'UPDATE `partidas` SET `CartasPila`=\''.implode(':', $mazo).'\', `UltActivo`=CURRENT_TIME() WHERE `Id`=\''.$id_partida.'\'';
+                    file_put_contents('eso.log', $sql);
                     $bbdd->query($sql);
 
                     $bbdd->close();

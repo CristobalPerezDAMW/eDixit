@@ -227,6 +227,8 @@ function ponerEstado(eligeCartaAnterior) {
     mensajePista.classList.add("quitar");
     divVotacion.classList.add("quitar");
     aceptarPuntuacion.classList.add("quitar");
+    mensaje1.innerHTML = "";
+    mensaje2.innerHTML = "";
 
     eligeCarta = false;
     if (estadoJuego == "Inicio") {
@@ -277,18 +279,31 @@ function ponerEstado(eligeCartaAnterior) {
         let yaEstanColocadas = false;
         //Break casero, para que cuando no haya muchas cartas tampoco se tire mucho rato en este bucle
         try {
+            console.log("Comprobando si divvotacion está ya colocado");
             divVotacion.childNodes.forEach(nodo => {
                 if (nodo.nodeType == 1) {
+                    console.log("Comprobando " + nodo);
+                    if (!cartasVotacion.includes(nodo.dataset.carta)) {
+                        console.log(cartasVotacion + " includes " + nodo.dataset.carta + ": FALSE");
+                        yaEstanColocadas = false;
+                        throw "break";
+                    }
+                    console.log(cartasVotacion + " includes " + nodo.dataset.carta + ": TRUE");
                     yaEstanColocadas = true;
-                    throw "break";
                 }
             });
         } catch (e) {
             if (e != "break") {
+                // console.log("BREAK");
                 throw e;
             }
         }
-        if (!yaEstanColocadas)
+        console.log("Conclusión: " + yaEstanColocadas);
+        if (!yaEstanColocadas) {
+            while (divVotacion.firstChild) {
+                console.log("Eliminado divvotacion hijo: " + divVotacion.lastChild);
+                divVotacion.removeChild(divVotacion.lastChild);
+            }
             for (let i = 0; i < cartasVotacion.length; i++) {
                 let div = document.createElement("div");
                 let img = document.createElement("img");
@@ -320,12 +335,13 @@ function ponerEstado(eligeCartaAnterior) {
                         // alert(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
                         getAsync(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
                         while (divVotacion.firstChild) {
+                            console.log("Eliminado divvotacion hijo: " + divVotacion.lastChild);
                             divVotacion.removeChild(divVotacion.lastChild);
                         }
                     });
                 }
 
-                // div.style = "max-width: " + (100 / cartasVotacion.length) + "%";
+                div.dataset.carta = cartasVotacion[i];
                 img.src = "cartas/carta" + cartasVotacion[i] + ".jpg";
                 img.alt = "Carta número " + i + 1;
                 img.dataset.numeroCarta = cartasVotacion[i];
@@ -336,6 +352,7 @@ function ponerEstado(eligeCartaAnterior) {
                 div.appendChild(img);
                 div.appendChild(p);
             }
+        }
     } else if (estadoJuego == "Puntuacion") {
         mensaje1.innerHTML = "Ronda Finalizada";
         if (puntuacionRonda != -1) {
@@ -404,7 +421,11 @@ function ponerEstado(eligeCartaAnterior) {
                     if (eligeCarta) {
                         crearEvento(currentValue, "click", function(event) {
                             event.preventDefault();
-                            elegirCarta(numCarta, currentIndex)
+                            try {
+                                elegirCarta(numCarta, currentIndex)
+                            } catch (e) {
+                                console.log("Error al cargar: " + e);
+                            }
                         });
                         currentValue.classList.add("elegible");
                     } else {
