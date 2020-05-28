@@ -124,7 +124,7 @@ function enPeticionLista() {
             ponerEstado(eligeCarta);
         }
     } else if (this.status != 200 && this.status != 0) {
-        alert("Ha habido un error con la comunicación con el servidor.\nPor favor, recarga la página si sigue experimentando problemas.\n" + this.status);
+        console.error("Ha habido un error con la comunicación con el servidor.\nPor favor, recarga la página si sigue experimentando problemas.\n" + this.status);
     }
 }
 
@@ -279,29 +279,22 @@ function ponerEstado(eligeCartaAnterior) {
         let yaEstanColocadas = false;
         //Break casero, para que cuando no haya muchas cartas tampoco se tire mucho rato en este bucle
         try {
-            console.log("Comprobando si divvotacion está ya colocado");
             divVotacion.childNodes.forEach(nodo => {
                 if (nodo.nodeType == 1) {
-                    console.log("Comprobando " + nodo);
                     if (!cartasVotacion.includes(nodo.dataset.carta)) {
-                        console.log(cartasVotacion + " includes " + nodo.dataset.carta + ": FALSE");
                         yaEstanColocadas = false;
                         throw "break";
                     }
-                    console.log(cartasVotacion + " includes " + nodo.dataset.carta + ": TRUE");
                     yaEstanColocadas = true;
                 }
             });
         } catch (e) {
             if (e != "break") {
-                // console.log("BREAK");
                 throw e;
             }
         }
-        console.log("Conclusión: " + yaEstanColocadas);
         if (!yaEstanColocadas) {
             while (divVotacion.firstChild) {
-                console.log("Eliminado divvotacion hijo: " + divVotacion.lastChild);
                 divVotacion.removeChild(divVotacion.lastChild);
             }
             for (let i = 0; i < cartasVotacion.length; i++) {
@@ -335,7 +328,6 @@ function ponerEstado(eligeCartaAnterior) {
                         // alert(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
                         getAsync(urlGet + "?accion=votar_carta&carta_votada=" + event.target.dataset.numeroCarta);
                         while (divVotacion.firstChild) {
-                            console.log("Eliminado divvotacion hijo: " + divVotacion.lastChild);
                             divVotacion.removeChild(divVotacion.lastChild);
                         }
                     });
