@@ -357,19 +357,22 @@ function ponerEstado(eligeCartaAnterior) {
         divCartas.classList.add("quitar");
         var ganadores = new Array();
         for (let i = 0; i < posicionJugadores.length; i++) {
-            if (posicionJugadores[1] >= 30) {
-                ganadores.push(posicionJugadores[0]);
+            if (posicionJugadores[i][1] >= 30) {
+                ganadores.push(posicionJugadores[i][0]);
             }
         }
         mensaje1.innerHTML = "Fin del juego";
-        mensaje2.innerHTML = "Ganadores: " + ganadores.join(", ") + "\n¡Bien jugado!";
+        mensaje2.innerHTML = (ganadores.length == 1 ? "Ganador: " : "Ganadores: ") + ganadores.join(", ") + '<br>¡Bien jugado!';
+        if (document.getElementById("btnVolver") == null) {
 
-        let btnVolver = document.createElement("button");
-        btnVolver.innerHTML = "Salir del Juego";
-        crearEvento(btnVolver, "click", function() {
-            window.location.href = "..";
-        });
-        divMensajes.appendChild(btnVolver);
+            let btnVolver = document.createElement("button");
+            btnVolver.id = "btnVolver";
+            btnVolver.innerHTML = "Salir del Juego";
+            crearEvento(btnVolver, "click", function() {
+                window.location.href = "..";
+            });
+            divMensajes.appendChild(btnVolver);
+        }
     } else {
         console.log("Error, no existe el estado " + estadoJuego);
         mensaje1.innerHTML = "Error: El estado no existe";

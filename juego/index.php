@@ -51,6 +51,9 @@ if (isset($_GET['accion'])){
             $posiciones[] = $fila[0].':'.$fila[1];
             if ($fila[1]>=30 && $estado!='Puntuacion'){
                 $estado = 'Final';
+                $sql = 'UPDATE `partidas` SET `Estado` = \'Final\'';
+                // die($sql);
+                $bbdd->query($sql);
             }
         }
 
@@ -80,18 +83,30 @@ if (isset($_GET['accion'])){
             $sql = 'SELECT `PuntuacionRonda` FROM `partida_jugador` WHERE `Jugador`=\''.$_SESSION['usuario_correo'].'\' AND `Partida`=\''.$id_partida.'\'';
             $puntuacion_ronda = mysqli_fetch_array($bbdd->query($sql))[0];
         } else if ($estado == 'Final'){
-            //Se va a ejecutar para cada jugador, pero no importa demasiado
-            // class HiloBorrar extends Thread {
-            //     public function run() {
-                    // sleep(6);
-                    // $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
-                    // $bbdd->query($sql);
-                    // $sql = 'DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\'';
-                    // $bbdd->query($sql);
+            // $sql = 'SELECT COUNT(*) FROM `partida_jugador` WHERE `FinalVisto`=\'0\' AND `Partida`=\''.$id_partida.'\'';
+            // // die($sql);
+            // $resultado = $bbdd->query($sql);
+            // $faltan_votar = array();
+            // if ($resultado!==false)
+            //     if ($fila = mysqli_fetch_array($resultado)){
+            //         if ($fila[0]==0){
+            //             $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
+            //             $bbdd->query($sql);
+            //             $sql = 'DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\'';
+            //             $bbdd->query($sql);
+            //         }
             //     }
-            // }
-            // $hilo = new HiloBorrar();
-            // $hilo->start();
+
+            // $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'; DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\';';
+            // $bbdd->multi_query($sql);
+
+            // $bbdd->begin_transaction();
+            // $bbdd->query('SELECT SLEEP(5);');
+            // $sql = 'DELETE FROM `partidas` WHERE `Id`=\''.$id_partida.'\'';
+            // $bbdd->query($sql);
+            // $sql = 'DELETE FROM `salas` WHERE `Id`=\''.$id_partida.'\'';
+            // $bbdd->query($sql);
+            // $bbdd->commit();
         }
     }else {
         die('Error: El jugador no está en ninguna partida');
