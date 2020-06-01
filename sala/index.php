@@ -353,7 +353,11 @@ if (!isset($_SESSION['iniciada'])){
 
 $sql = 'SELECT `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra`, COUNT(`sala_jugador`.Jugador)+1 FROM `salas` LEFT OUTER JOIN `sala_jugador` ON `Sala` = `Id` GROUP BY `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra`';
 $resultado = $bbdd->query($sql);
-if ($resultado===false || $resultado->num_rows==0){
+while ($fila = @mysqli_fetch_array($resultado)){
+    if ($fila[3]!=$fila[5])
+        $salas[] = array($fila[0], $fila[1], $fila[2], $fila[3], $fila[4]===NULL? 'false': 'true');
+}
+if ($resultado===false || $resultado->num_rows==0 || !isset($salas)){
     echo '<h3 class="salas">No hay salas, pero tú puedes <a href="crear">crear una sala</a>.</h3>';
 } else {
     echo '<div class="container salas">
@@ -374,32 +378,33 @@ if ($resultado===false || $resultado->num_rows==0){
         </div>';
     
     //TODO: nada por GET, todo por POST
-    while ($fila = mysqli_fetch_array($resultado)){
+    foreach($salas as $sala){
         // `Id`, `Anfitrion`, `Descripcion`, `Maximo`, `Contra`, count(`sala_jugador`.Jugador)
-        $salas[] = array($fila[0], $fila[1], $fila[2], $fila[3], $fila[4]===NULL? 'false': 'true');
-        echo '<div class="row">
-            <div class="col-md-1 col-6">'.
-                ($fila[4]===null 
-                ?'<svg title="Sin Contraseña" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="lock-open" class="svg-inline--fa fa-lock-open fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="#ba9c4a" d="M423.5 0C339.5.3 272 69.5 272 153.5V224H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48h-48v-71.1c0-39.6 31.7-72.5 71.3-72.9 40-.4 72.7 32.1 72.7 72v80c0 13.3 10.7 24 24 24h32c13.3 0 24-10.7 24-24v-80C576 68 507.5-.3 423.5 0z"></path></svg>'
-                :'<svg title="Con Contraseña" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="lock" class="svg-inline--fa fa-lock fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#ba9c4a" d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"></path></svg>')
-            .'</div>
-            <div class="col-md-3 col-6">
-                <p>'.$fila[1].'</p>
-            </div>
-            <div class="col-md-3 col-6">
-                <p>'.$fila[2].'</p>
-            </div>
-            <div class="col-md-2 col-6">
-                <p>'.$fila[5].'/'.$fila[3].'</p>
-            </div>
-            <div class="col-md-3">
-                <form id="form-'.$fila[0].'" method="POST">
-                    <input type="hidden" name="sala" value="'.$fila[0].'"/>
-                    <input type="hidden" id="contra-'.$fila[0].'" name="contra" value=""/>
-                    <input type="submit" id="btn-'.$fila[0].'" '.(isset($_SESSION['iniciada'])?'':'disabled').' name="unirse" value="Unirse"/>
-                </form>
-            </div>
-        </div>';
+        if ($sala[3]!=$sala[5]){
+            echo '<div class="row">
+                <div class="col-md-1 col-6">'.
+                    ($sala[4]===null 
+                    ?'<svg title="Sin Contraseña" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="lock-open" class="svg-inline--fa fa-lock-open fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="#ba9c4a" d="M423.5 0C339.5.3 272 69.5 272 153.5V224H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48h-48v-71.1c0-39.6 31.7-72.5 71.3-72.9 40-.4 72.7 32.1 72.7 72v80c0 13.3 10.7 24 24 24h32c13.3 0 24-10.7 24-24v-80C576 68 507.5-.3 423.5 0z"></path></svg>'
+                    :'<svg title="Con Contraseña" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="lock" class="svg-inline--fa fa-lock fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#ba9c4a" d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"></path></svg>')
+                .'</div>
+                <div class="col-md-3 col-6">
+                    <p>'.$sala[1].'</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <p>'.$sala[2].'</p>
+                </div>
+                <div class="col-md-2 col-6">
+                    <p>'.$sala[5].'/'.$sala[3].'</p>
+                </div>
+                <div class="col-md-3">
+                    <form id="form-'.$sala[0].'" method="POST">
+                        <input type="hidden" name="sala" value="'.$sala[0].'"/>
+                        <input type="hidden" id="contra-'.$sala[0].'" name="contra" value=""/>
+                        <input type="submit" id="btn-'.$sala[0].'" '.(isset($_SESSION['iniciada'])?'':'disabled').' name="unirse" value="Unirse"/>
+                    </form>
+                </div>
+            </div>';
+        }
     }
     echo '</div>';
 }
