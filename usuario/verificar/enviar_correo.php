@@ -8,7 +8,7 @@ $enlaceConfirmar = 'http://www.iesmurgi.org:86/~cristobal/usuario/verificar/?ver
 
 $body = 'Hola, '.$_SESSION['usuario_nombre'].' <a href="'.$enlaceConfirmar.'">verifica aquí</a> tu correo electrónico para acceder a todas las características de eDixit<br>
 También puedes copiar el siguiente enlace y pegarlo en la ventana de tu navegador:<br>'.$enlaceConfirmar;
-$bodySinHTML = 'Hola, '.$_SESSION['usuario_nombre'].' copia y pega esto en un navegador para verificar su correo: '.$enlaceConfirmar.' para acceder a todas las características de eDixit';
+$bodySinHTML = 'Hola, '.$_SESSION['usuario_nombre'].' copie y pegue este enlace en un navegador para verificar su correo: '.$enlaceConfirmar;
 
 
 try {
@@ -19,9 +19,11 @@ try {
     $mail = new PHPMailer();
     
     //Server settings
-    // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
     $mail->isSMTP();
+    $mail->SMTPDebug = SMTP::DEBUG_CONNECTION;
+    $mail->Debugoutput = 'html';
     $mail->Host = 'smtp.gmail.com';
+    // $mail->Host = gethostbyname('smtp.gmail.com');
     $mail->SMTPAuth = true;
     $mail->Username = 'cristichiedixit@gmail.com';
     $mail->Password = 'MiContraGuapisime312';
@@ -40,7 +42,7 @@ try {
     // Content
     $mail->CharSet = 'UTF-8';
     $mail->isHTML(true);
-    $mail->Subject = 'Verifica tu email en eDixit';
+    $mail->Subject = 'Verifica tu email para jugar a eDixit';
     $mail->Body = $body;
     $mail->AltBody = $bodySinHTML;
 
@@ -48,7 +50,8 @@ try {
         $_SESSION['mensaje_cabecera'] = 'Correo de verificación enviado';
         $_SESSION['mensaje_cabecera_bien'] = true;
     } else {
-        $_SESSION['mensaje_cabecera'] = 'El correo de verificación no se pudo enviar';
+        file_put_contents('errores.log', 'Error al enviar correo: '.$mail->ErrorInfo);
+        $_SESSION['mensaje_cabecera'] = 'El correo de verificación no se pudo enviar, contacte con un administrador. Disculpe las molestias.';
         $_SESSION['mensaje_cabecera_bien'] = false;
     }
     if (isset($_REQUEST['volver'])){

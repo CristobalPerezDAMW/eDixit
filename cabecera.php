@@ -2,6 +2,8 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+// phpinfo();
+// die();
 if (!isset($ruta)){
     $ruta = '.';
 }
