@@ -358,7 +358,11 @@ function ponerEstado(eligeCartaAnterior) {
         var ganadores = new Array();
         for (let i = 0; i < posicionJugadores.length; i++) {
             if (posicionJugadores[i][1] >= 30) {
-                ganadores.push(posicionJugadores[i][0]);
+                for (let j = 0; j < jugadores.length; j++) {
+                    if (jugadores[j].correo == posicionJugadores[i][0]) {
+                        ganadores.push(jugadores[j].nombre);
+                    }
+                }
             }
         }
         mensaje1.innerHTML = "Fin del juego";
