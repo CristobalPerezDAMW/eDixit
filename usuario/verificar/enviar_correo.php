@@ -4,7 +4,11 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-$enlaceConfirmar = 'http://www.iesmurgi.org:86/~cristobal/usuario/verificar/?verificacion='.urlencode($_SESSION['verificacion']).'&correo='.urlencode($_SESSION['usuario_correo']);
+// $enlaceConfirmar = 'http://www.iesmurgi.org:86/~cristobal/usuario/verificar/?verificacion='.urlencode($_SESSION['verificacion']).'&correo='.urlencode($_SESSION['usuario_correo']);
+$enlaceConfirmar = $_SERVER['SERVER_NAME'].$_SERVER['CONTEXT_PREFIX'].'/usuario/verificar/?verificacion='.urlencode($_SESSION['verificacion']).'&correo='.urlencode($_SESSION['usuario_correo']);
+// var_export($_SERVER);
+// echo '<br>';
+// die($enlaceConfirmar);
 
 $body = 'Hola, '.$_SESSION['usuario_nombre'].' <a href="'.$enlaceConfirmar.'">verifica aquí</a> tu correo electrónico para acceder a todas las características de eDixit<br>
 También puedes copiar el siguiente enlace y pegarlo en la ventana de tu navegador:<br>'.$enlaceConfirmar;
