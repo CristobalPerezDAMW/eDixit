@@ -16,19 +16,35 @@ try {
     require '../../phpmailer/src/PHPMailer.php';
     require '../../phpmailer/src/SMTP.php';
     
+    // Modo debug
+    // $mail = new PHPMailer(true);
     $mail = new PHPMailer();
     
     //Server settings
     $mail->isSMTP();
-    $mail->SMTPDebug = SMTP::DEBUG_CONNECTION;
-    $mail->Debugoutput = 'html';
-    $mail->Host = 'smtp.gmail.com';
+    $mai->Mailer = 'smtp';
+    // $mail->SMTPDebug = SMTP::DEBUG_CONNECTION;
+    // $mail->Debugoutput = 'html';
+    // $mail->Host = 'smtp.gmail.com';
     // $mail->Host = gethostbyname('smtp.gmail.com');
+    // $mail->Host = '142.250.13.108';
+    $mail->Host = gethostbyname('tls://smtp.gmail.com');
     $mail->SMTPAuth = true;
     $mail->Username = 'cristichiedixit@gmail.com';
     $mail->Password = 'MiContraGuapisime312';
+    $mail->Password = 'kwvhjykpheqxtdum';
+    // $mail->Password = 'kwvhjykpheqxtdum';
     $mail->SMTPSecure = 'tls';
-    $mail->Port = 587;
+    $mail->Port = '587';
+    // $mail->SMTPSecure = 'ssl';
+    // $mail->Port = 465;
+    // $PHPMailer->SMTPOptions = array (
+    //     'ssl' => array (
+    //         'verify_peer' => false,
+    //         'verify_peer_name' => false,
+    //         'allow_self_signed' => true
+    //     )
+    // );
 
     //Recipients
     $mail->SetFrom('cristichiedixit@gmail.com', 'eDixit');
@@ -50,7 +66,7 @@ try {
         $_SESSION['mensaje_cabecera'] = 'Correo de verificación enviado';
         $_SESSION['mensaje_cabecera_bien'] = true;
     } else {
-        file_put_contents('errores.log', 'Error al enviar correo: '.$mail->ErrorInfo);
+        // file_put_contents('errores.log', 'Error al enviar correo: '.$mail->ErrorInfo);
         $_SESSION['mensaje_cabecera'] = 'El correo de verificación no se pudo enviar, contacte con un administrador. Disculpe las molestias.';
         $_SESSION['mensaje_cabecera_bien'] = false;
     }
