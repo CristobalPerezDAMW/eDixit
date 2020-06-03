@@ -49,8 +49,7 @@ CREATE TABLE `partida_jugador` (
   `Mano` tinytext,
   `CartaElegida` tinyint(3) UNSIGNED DEFAULT NULL,
   `CartaVotada` int(11) DEFAULT NULL,
-  `PuntuacionRonda` int(11) DEFAULT NULL,
-  `FinalVisto` tinyint(1) NOT NULL DEFAULT '0'
+  `PuntuacionRonda` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
