@@ -3,12 +3,12 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 15-05-2020 a las 08:25:54
+-- Tiempo de generación: 03-06-2020 a las 10:52:01
 -- Versión del servidor: 10.1.44-MariaDB-0ubuntu0.18.04.1
--- Versión de PHP: 7.2.24-0ubuntu0.18.04.4
+-- Versión de PHP: 7.2.24-0ubuntu0.18.04.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+-- SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `cristobal`
+-- Base de datos: ``
 --
 
 -- --------------------------------------------------------
@@ -28,19 +28,13 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `partidas` (
   `Id` int(11) NOT NULL,
-  `Cuentacuentos` varchar(200) DEFAULT NULL,
+  `Cuentacuentos` varchar(100) DEFAULT NULL,
   `Pista` text,
   `CartasPila` text NOT NULL,
+  `CartasDescartadas` text NOT NULL,
   `Estado` varchar(20) NOT NULL DEFAULT 'Inicio',
   `UltActivo` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Volcado de datos para la tabla `partidas`
---
-
-INSERT INTO `partidas` (`Id`, `Cuentacuentos`, `Pista`, `CartasPila`, `Estado`, `UltActivo`) VALUES
-(115, 'admin@admin.ga', 'día del libro', '19:20:21:22:23:24:25:26:27', 'Votacion', '2020-05-15 08:20:39');
 
 -- --------------------------------------------------------
 
@@ -50,20 +44,14 @@ INSERT INTO `partidas` (`Id`, `Cuentacuentos`, `Pista`, `CartasPila`, `Estado`, 
 
 CREATE TABLE `partida_jugador` (
   `Partida` int(11) NOT NULL,
-  `Jugador` varchar(200) NOT NULL,
-  `Posicion` int(11) NOT NULL,
+  `Jugador` varchar(100) NOT NULL,
+  `Posicion` int(11) NOT NULL DEFAULT '0',
   `Mano` tinytext,
-  `CartaElegida` tinyint(3) UNSIGNED DEFAULT NULL
+  `CartaElegida` tinyint(3) UNSIGNED DEFAULT NULL,
+  `CartaVotada` int(11) DEFAULT NULL,
+  `PuntuacionRonda` int(11) DEFAULT NULL,
+  `FinalVisto` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Volcado de datos para la tabla `partida_jugador`
---
-
-INSERT INTO `partida_jugador` (`Partida`, `Jugador`, `Posicion`, `Mano`, `CartaElegida`) VALUES
-(115, 'admin@admin.ga', 0, '1:3:4:5:6', 2),
-(115, 'cristichi@hotmail.es', 0, '7:8:9:10:12', 11),
-(115, 'usuario', 0, '13:14:15:16:17', 18);
 
 -- --------------------------------------------------------
 
@@ -72,7 +60,7 @@ INSERT INTO `partida_jugador` (`Partida`, `Jugador`, `Posicion`, `Mano`, `CartaE
 --
 
 CREATE TABLE `usuarios` (
-  `Correo` varchar(200) NOT NULL,
+  `Correo` varchar(100) NOT NULL,
   `Nombre` text NOT NULL,
   `Contra` text NOT NULL,
   `Admin` tinyint(1) NOT NULL DEFAULT '0',
@@ -83,17 +71,18 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`Correo`, `Nombre`, `Contra`, `Admin`, `Verificacion`) VALUES
-('admin', 'Administrador', '21232f297a57a5a743894a0e4a801fc3', 1, NULL),
-('admin@admin.ga', 'Administrador', '21232f297a57a5a743894a0e4a801fc3', 1, NULL),
-('cristichi@hotmail.es', 'Cristichi', '6e7bc035c10d6d628e9067ae9b034d41', 0, NULL),
-('cristichikillerpsn@gmail.com', 'Cristichi', '6e7bc035c10d6d628e9067ae9b034d41', 0, NULL),
-('cristobalperez.dam@gmail.com', 'Cristichi DAM', '3488e28acfe4abe097e1f4d501d4b49a', 0, NULL),
-('fdgongora@iesmurgi.org', 'Pepe', '6588291fabc526ef29eef7f5e73a66f6', 0, NULL),
-('focusyi@hotmail.com', 'Danikileitor', '25f9e794323b453885f5181f1b624d0b', 0, NULL),
-('ramperrub@gmail.com', 'Ramon', '52e95dde8c35e734e92e3cedbfe75b27', 0, 'ABg0Tg5pZg3OuTbFPgprq7EeNAIskO'),
-('usuario', 'usuario', 'f8032d5cae3de20fcec887f395ec9a6a', 0, NULL),
-('very_18_8@hotmail.es', 'Verónica ', '36208229a1f277c3c27b69db861be759', 0, NULL);
+-- INSERT INTO `usuarios` (`Correo`, `Nombre`, `Contra`, `Admin`, `Verificacion`) VALUES
+-- ('admin', 'Administrador', '21232f297a57a5a743894a0e4a801fc3', 1, NULL),
+-- ('admin@admin.ga', 'Administrador', '21232f297a57a5a743894a0e4a801fc3', 1, NULL),
+-- ('cristichi@hotmail.es', 'Cristichi', '6e7bc035c10d6d628e9067ae9b034d41', 0, NULL),
+-- ('cristichiedixit@gmail.com', 'eDixit Oficial', '6e7bc035c10d6d628e9067ae9b034d41', 1, NULL),
+-- ('cristichikillerpsn@gmail.com', 'Cristichi', '6e7bc035c10d6d628e9067ae9b034d41', 0, NULL),
+-- ('cristobalperez.dam@gmail.com', 'Cristichi', '6e7bc035c10d6d628e9067ae9b034d41', 0, NULL),
+-- ('fdgongora@iesmurgi.org', 'Pepe', '6588291fabc526ef29eef7f5e73a66f6', 0, NULL),
+-- ('focusyi@hotmail.com', 'Danikileitor', '25f9e794323b453885f5181f1b624d0b', 0, NULL),
+-- ('ramperrub@gmail.com', 'Ramon', '52e95dde8c35e734e92e3cedbfe75b27', 0, 'ABg0Tg5pZg3OuTbFPgprq7EeNAIskO'),
+-- ('usuario', 'usuario', 'usuario', 0, NULL),
+-- ('very_18_8@hotmail.es', 'Verónica ', '36208229a1f277c3c27b69db861be759', 0, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -118,7 +107,7 @@ ALTER TABLE `partida_jugador`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`Correo`(40)),
-  ADD UNIQUE KEY `Correo` (`Correo`);
+  ADD KEY `Correo` (`Correo`) USING BTREE;
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -137,14 +126,25 @@ ALTER TABLE `partidas`
 -- Filtros para la tabla `partidas`
 --
 ALTER TABLE `partidas`
-  ADD CONSTRAINT `partida_cuentacuentos` FOREIGN KEY (`Cuentacuentos`) REFERENCES `usuarios` (`Correo`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `partida_cuentacuentos` FOREIGN KEY (`Cuentacuentos`) REFERENCES `usuarios` (`Correo`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `partida_sala` FOREIGN KEY (`Id`) REFERENCES `salas` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `partida_jugador`
 --
 ALTER TABLE `partida_jugador`
-  ADD CONSTRAINT `partida_jugador_ibfk_1` FOREIGN KEY (`Partida`) REFERENCES `partidas` (`Id`),
-  ADD CONSTRAINT `partida_jugador_ibfk_2` FOREIGN KEY (`Jugador`) REFERENCES `usuarios` (`Correo`);
+  ADD CONSTRAINT `partida_jugador_ibfk_1` FOREIGN KEY (`Partida`) REFERENCES `partidas` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `partida_jugador_ibfk_2` FOREIGN KEY (`Jugador`) REFERENCES `usuarios` (`Correo`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Eventos
+--
+DELIMITER $$
+CREATE DEFINER=`cristobal`@`%` EVENT `evento_fin_partida` ON SCHEDULE EVERY 10 SECOND STARTS '2020-04-04 00:00:00' ON COMPLETION NOT PRESERVE ENABLE COMMENT 'Cada 10 segundos, comprueba si alguna partida tiene que borrarse' DO BEGIN
+  DELETE `salas`, `partidas` FROM `salas` INNER JOIN `partidas` ON `partidas`.`Id`=`salas`.`Id` WHERE `Estado`='Final' AND `UltActivo` <  NOW() + INTERVAL -5 SECOND;
+END$$
+
+DELIMITER ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
