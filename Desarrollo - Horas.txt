@@ -1,3 +1,4 @@
+-- Horas de diseño y programación
 08/02: 6h
 09/02: 6h
 15/02: 2h
@@ -35,4 +36,9 @@
 29/05: 3h
 01/06: 2h
 02/06: 4h
--- 106 horas
+-- Total 106 horas de diseño y programación
+
+-- Horas de documentación
+02/06: 1h
+03/06: 3h
+-- Total 4 horas de documentación
