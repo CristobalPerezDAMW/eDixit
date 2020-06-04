@@ -207,16 +207,6 @@ function init() {
     });
 
     pedirEstadoJuego();
-
-    var musica = new Audio('media/background.ogg');
-    musica.autoplay = true;
-    musica.addEventListener("canplaythrough", event => {
-        musica.play();
-    });
-    musica.addEventListener('ended', function() {
-        this.currentTime = 0;
-        this.play();
-    }, false);
 }
 
 function ponerEstado(eligeCartaAnterior) {
