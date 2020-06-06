@@ -41,4 +41,5 @@
 -- Horas de documentación
 02/06: 1h
 03/06: 3h
--- Total 4 horas de documentación
+04/06: 1h
+-- Total 5 horas de documentación
