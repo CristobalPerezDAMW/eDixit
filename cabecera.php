@@ -120,7 +120,7 @@ if (isset($_SESSION['iniciada'])){
                             aria-haspopup="true" aria-expanded="false"><img class="perfil-mini mr-1" src="'.$foto.'?='.filemtime($foto).'" alt="Tu foto de perfil"/>'.$_SESSION['usuario_nombre'].'</a>';
                             echo '
                             <div class="dropdown-menu">
-                                <a class="dropdown-item '.($pag=='Mi Perfil'?'disabled':'').'" href="'.$ruta.'/usuario">Mi perfil</a>
+                                <a class="dropdown-item '.($pag=='Mi Perfil'?'disabled':'').'" href="'.$ruta.'/usuario">Mi Perfil</a>
                                 <a class="dropdown-item '.($pag=='Editar Perfil'?'disabled':'').'" href="'.$ruta.'/usuario/editar">Editar Perfil</a>
                                 <a class="dropdown-item" href="'.$ruta.'/login/cerrar.php">Cerrar Sesión</a>
                             </div>
