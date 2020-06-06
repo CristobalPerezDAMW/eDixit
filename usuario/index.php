@@ -40,14 +40,14 @@ require("../cabecera.php");
     </div>
 </div>
 
-<div class="container mt-5">
+<!-- <div class="container mt-5">
     <div class="row">
         <div class="col-12 d-flex justify-content-center">
             <h2>Pronto: Tus stats</h2>
             <p></p>
         </div>
     </div>
-</div>
+</div> -->
 
 </body>
 
