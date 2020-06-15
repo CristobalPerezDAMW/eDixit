@@ -158,6 +158,8 @@ if (!isset($_SESSION['iniciada'])){
         $desc = $fila[2];
         $max = $fila[3];
         $jug = $fila[4];
+        // echo($sql.'<br>');
+        // var_export($fila);
 
         if ($host==$_SESSION['usuario_correo'] || $jug==$_SESSION['usuario_correo']){
             $sql = 'SELECT `Jugador`, `Listo` FROM `salas`, `sala_jugador` WHERE `Id`=`Sala` AND `Anfitrion`=\''.$host.'\'';
@@ -338,7 +340,9 @@ if (!isset($_SESSION['iniciada'])){
                 crearEvento(btnSalir, "click", function() {
                     if (confirm('¿Seguro que quieres salir? Si creaste la sala, la borrarás')){
                         getAsync(urlGet+"?accion=salir&sala="+sala);
-                        location.reload();    
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);  
                     }
                 });
                 pedirEstadoSala();
