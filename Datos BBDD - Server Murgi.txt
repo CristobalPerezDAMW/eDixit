@@ -1,9 +1,0 @@
-bbdd: cristobal
-usuario: cristobal@localhost
-contra: OLmPQa5KMd
-
-DATOS ANTIGUOS:
-
-bbdd: cristobal
-usuario: cristobal@localhost
-contra: cristobal
