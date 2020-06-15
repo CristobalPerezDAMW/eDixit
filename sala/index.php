@@ -338,7 +338,7 @@ if (!isset($_SESSION['iniciada'])){
                 crearEvento(btnSalir, "click", function() {
                     if (confirm('¿Seguro que quieres salir? Si creaste la sala, la borrarás')){
                         getAsync(urlGet+"?accion=salir&sala="+sala);
-                        location.href = location.href;    
+                        location.reload();    
                     }
                 });
                 pedirEstadoSala();
