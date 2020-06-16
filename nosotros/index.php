@@ -7,7 +7,7 @@ require("../cabecera.php");
 <div class="container nosotros">
     <div class="row">
         <div class="col-12">
-            <h2>Contacto con un Admnistrador</h2>
+            <h2>Contacto con un Administrador</h2>
         </div>
         <div class="col-12">
             <p>Si tienes algún problema, duda, sugerencia o queja por favor escríbenos a nuestro correo electrónico <a href="mailto:cristobalperez.dam@gmail.com">cristobalperez.dam@gmail.com</a>. Te responderemos lo antes posible.</p>
